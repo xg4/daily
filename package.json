@@ -51,15 +51,13 @@
   },
   "dependencies": {
     "dotenv": "^8.2.0",
-    "puppeteer": "^2.1.1",
-    "superagent": "^5.2.1"
+    "puppeteer": "^2.1.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
     "@types/node": "^13.7.1",
     "@types/puppeteer": "^2.0.0",
-    "@types/superagent": "^4.1.6",
     "@typescript-eslint/eslint-plugin": "^2.19.2",
     "@typescript-eslint/parser": "^2.19.2",
     "eslint": "^6.8.0",

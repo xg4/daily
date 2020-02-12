@@ -23,6 +23,7 @@
     "pretty": "prettier --write src/**/*",
     "serve": "ts-node --files --transpile-only",
     "serve:acfun": "npm run serve -- ./src/tasks/acfun",
+    "serve:music163": "npm run serve -- ./src/tasks/music163",
     "prestart": "npm run build",
     "start": "pm2 start ./dist/index.js"
   },

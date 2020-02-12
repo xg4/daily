@@ -18,15 +18,21 @@ async function bootstrap() {
   }
   await page.type('#ipt-account-login', CONFIG.ACFUN_USERNAME)
   await page.type('#ipt-pwd-login', CONFIG.ACFUN_PASSWORD)
-  await Promise.all([
-    page.waitForNavigation(),
-    page.click('#form-login > div.area-tool > div')
-  ])
-  // const cookies = await page.cookies()
-  // console.log(cookies)
+  await page.click('#form-login > div.area-tool > div')
+  const result = await page.waitForResponse(
+    'https://id.app.acfun.cn/rest/web/login/signin'
+  )
+  const data: any = await result.json()
+  if (data.result) {
+    console.log('登录失败')
+    return
+  }
   await page.goto('https://www.acfun.cn/member/')
-
   await page.click('#btn-sign-user')
+  const checkInBtn = await page.waitForSelector(
+    '#sign-content > div.sign-in-web'
+  )
+  await checkInBtn.click()
 }
 
 bootstrap()

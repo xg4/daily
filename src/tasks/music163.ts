@@ -8,8 +8,6 @@ async function bootstrap() {
   const [page] = await browser.pages()
   await page.setViewport({ width: 1200, height: 900 })
   await page.goto('https://music.163.com/')
-
-  // await page.click('#index-enter-default')
   const [_, frame] = await page.frames()
   const loginBtn = await frame.waitForSelector('#index-enter-default')
   await loginBtn.click()

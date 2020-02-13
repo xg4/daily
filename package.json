@@ -24,6 +24,7 @@
     "serve": "ts-node --files --transpile-only",
     "serve:acfun": "npm run serve -- ./src/tasks/acfun",
     "serve:music163": "npm run serve -- ./src/tasks/music163",
+    "serve:v2ex": "npm run serve -- ./src/tasks/v2ex",
     "prestart": "npm run build",
     "start": "pm2 start ./dist/index.js"
   },
@@ -50,12 +51,14 @@
     ]
   },
   "dependencies": {
+    "cookie": "^0.4.0",
     "dotenv": "^8.2.0",
     "puppeteer": "^2.1.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
+    "@types/cookie": "^0.3.3",
     "@types/node": "^13.7.1",
     "@types/puppeteer": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^2.19.2",

@@ -9,9 +9,7 @@ async function bootstrap() {
   })
   const [page] = await browser.pages()
   await page.setViewport({ width: 1200, height: 900 })
-  await page.goto(
-    'https://www.acfun.cn/login/?returnUrl=https%3A%2F%2Fwww.acfun.cn%2F'
-  )
+  await page.goto('https://www.acfun.cn/login')
   const isLoginForm = await page.$eval('#login', el =>
     el.classList.contains('login-account')
   )

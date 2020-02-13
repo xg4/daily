@@ -31,4 +31,8 @@ async function bootstrap() {
   await page.click('#Main > div.box > div:nth-child(2) > input')
 }
 
-bootstrap()
+try {
+  bootstrap()
+} catch {
+  process.exit(0)
+}

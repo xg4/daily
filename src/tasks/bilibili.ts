@@ -31,4 +31,8 @@ async function bootstrap() {
   })
 }
 
-bootstrap()
+try {
+  bootstrap()
+} catch {
+  process.exit(0)
+}

@@ -1,4 +1,4 @@
-name: Check In
+name: Daily Tasks
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  spider:
+  check-in:
     runs-on: ubuntu-latest
 
     env:

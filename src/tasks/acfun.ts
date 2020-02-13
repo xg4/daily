@@ -35,4 +35,8 @@ async function bootstrap() {
   await checkInBtn.click()
 }
 
-bootstrap()
+try {
+  bootstrap()
+} catch {
+  process.exit(0)
+}

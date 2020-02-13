@@ -4,7 +4,7 @@ import CONFIG from '../config'
 async function bootstrap() {
   const browser = await puppeteer.launch({
     ignoreHTTPSErrors: true,
-    headless: true,
+    headless: false,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
   const [page] = await browser.pages()

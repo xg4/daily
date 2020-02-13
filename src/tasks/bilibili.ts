@@ -5,7 +5,7 @@ import CONFIG from '../config'
 async function bootstrap() {
   const browser = await puppeteer.launch({
     ignoreHTTPSErrors: true,
-    headless: true,
+    headless: false,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
   const [page] = await browser.pages()
@@ -29,6 +29,7 @@ async function bootstrap() {
   await page.goto('https://account.bilibili.com/account/coin', {
     waitUntil: 'domcontentloaded'
   })
+  await browser.close()
 }
 
 bootstrap().catch(() => {

@@ -1,6 +1,7 @@
 import cookie from 'cookie'
 import puppeteer from 'puppeteer'
 import CONFIG from '../config'
+import { bot } from '../utils'
 
 async function bootstrap() {
   const browser = await puppeteer.launch({
@@ -29,9 +30,11 @@ async function bootstrap() {
   await page.goto('https://account.bilibili.com/account/coin', {
     waitUntil: 'domcontentloaded'
   })
+  await bot.text(`bilibili 签到 => 成功`)
   await browser.close()
 }
 
-bootstrap().catch(() => {
+bootstrap().catch(async err => {
+  await bot.text(`bilibili 签到 => 错误 \n ${err?.message ?? err}`)
   process.exit(0)
 })

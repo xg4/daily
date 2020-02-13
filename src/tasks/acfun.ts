@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer'
 import CONFIG from '../config'
+import { bot } from '../utils'
 
 async function bootstrap() {
   const browser = await puppeteer.launch({
@@ -34,13 +35,16 @@ async function bootstrap() {
       '#sign-content > div.sign-in-web'
     )
     await checkInBtn.click()
+    await bot.text('acfun 签到 => 成功')
   } catch {
     // 已签到
+    await bot.text('acfun 签到 => 已签到')
   }
 
   await browser.close()
 }
 
-bootstrap().catch(() => {
+bootstrap().catch(async err => {
+  await bot.text(`acfun 签到 => 错误 \n ${err?.message ?? err}`)
   process.exit(0)
 })

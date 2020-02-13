@@ -4,7 +4,7 @@ import CONFIG from '../config'
 async function bootstrap() {
   const browser = await puppeteer.launch({
     ignoreHTTPSErrors: true,
-    headless: true,
+    headless: false,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
   const [page] = await browser.pages()
@@ -29,14 +29,18 @@ async function bootstrap() {
   }
   await page.goto('https://www.acfun.cn/member/')
   await page.click('#btn-sign-user')
-  const checkInBtn = await page.waitForSelector(
-    '#sign-content > div.sign-in-web'
-  )
-  await checkInBtn.click()
+  try {
+    const checkInBtn = await page.waitForSelector(
+      '#sign-content > div.sign-in-web'
+    )
+    await checkInBtn.click()
+  } catch {
+    // 已签到
+  }
+
+  await browser.close()
 }
 
-try {
-  bootstrap()
-} catch {
+bootstrap().catch(() => {
   process.exit(0)
-}
+})

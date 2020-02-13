@@ -31,8 +31,6 @@ async function bootstrap() {
   })
 }
 
-try {
-  bootstrap()
-} catch {
+bootstrap().catch(() => {
   process.exit(0)
-}
+})

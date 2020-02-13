@@ -25,8 +25,6 @@ async function bootstrap() {
   await browser.close()
 }
 
-try {
-  bootstrap()
-} catch {
+bootstrap().catch(() => {
   process.exit(0)
-}
+})

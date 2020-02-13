@@ -23,6 +23,7 @@
     "pretty": "prettier --write src/**/*",
     "serve": "ts-node --files --transpile-only",
     "serve:acfun": "npm run serve -- ./src/tasks/acfun",
+    "serve:bilibili": "npm run serve -- ./src/tasks/bilibili",
     "serve:music163": "npm run serve -- ./src/tasks/music163",
     "serve:v2ex": "npm run serve -- ./src/tasks/v2ex",
     "prestart": "npm run build",

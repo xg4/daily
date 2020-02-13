@@ -1,0 +1,50 @@
+name: Check In
+
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  spider:
+    runs-on: ubuntu-latest
+
+    env:
+      BOT_WEBHOOK: ${{ secrets.BOT_WEBHOOK }}
+      BOT_SECRET: ${{ secrets.BOT_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 5
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Install
+        run: yarn
+
+      - name: acfun.cn
+        run: npm run serve:acfun
+        env:
+          ACFUN_USERNAME: ${{ secrets.ACFUN_USERNAME }}
+          ACFUN_PASSWORD: ${{ secrets.ACFUN_PASSWORD }}
+
+      - name: bilibili.com
+        run: npm run serve:bilibili
+        env:
+          BILIBILI_COOKIE: ${{ secrets.BILIBILI_COOKIE }}
+
+      - name: music.163.com
+        run: npm run serve:music163
+        env:
+          MUSIC163_USERNAME: ${{ secrets.MUSIC163_USERNAME }}
+          MUSIC163_PASSWORD: ${{ secrets.MUSIC163_PASSWORD }}
+
+      - name: v2ex.com
+        run: npm run serve:v2ex
+        env:
+          V2EX_COOKIE: ${{ secrets.V2EX_COOKIE }}

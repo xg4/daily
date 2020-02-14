@@ -1,4 +1,5 @@
 import cookie from 'cookie'
+import dayjs from 'dayjs'
 import puppeteer from 'puppeteer'
 import CONFIG from '../config'
 import { bot } from '../utils'
@@ -29,14 +30,34 @@ async function bootstrap() {
   await page.goto('https://www.v2ex.com/mission/daily', {
     waitUntil: 'domcontentloaded'
   })
-  await page.click('#Main > div.box > div:nth-child(2) > input')
+  await Promise.all([
+    page.click('#Main > div.box > div:nth-child(2) > input'),
+    page.waitForNavigation({
+      waitUntil: 'domcontentloaded'
+    })
+  ])
+  await page.goto('https://www.v2ex.com/balance', {
+    waitUntil: 'domcontentloaded'
+  })
+  const records = await page.$$eval(
+    '#Main > div.box > div:nth-child(4) > table > tbody > tr',
+    els => els.map(el => el.textContent?.split('\n') ?? [])
+  )
+  const isCheckedIn = records.some(
+    ([_, date, type]) => dayjs().isSame(date, 'day') && type === '每日登录奖励'
+  )
   await browser.close()
+
+  if (isCheckedIn) {
+    return '已签到'
+  }
+  return '成功'
 }
 
 bootstrap()
-  .then(async () => {
+  .then(async msg => {
     console.log('success')
-    await bot.text(`v2ex 签到 => 成功`)
+    await bot.text(`v2ex 签到 => ${msg}`)
   })
   .catch(async err => {
     console.log('error', err)

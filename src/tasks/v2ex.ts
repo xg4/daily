@@ -35,6 +35,7 @@ async function bootstrap() {
 }
 
 bootstrap().catch(async err => {
+  console.log(err)
   await bot.text(`v2ex 签到 => 错误 \n ${err?.message ?? err}`)
   process.exit(0)
 })

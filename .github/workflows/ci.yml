@@ -27,11 +27,11 @@ jobs:
       - name: Install
         run: yarn
 
-      - name: acfun.cn
-        run: npm run serve:acfun
-        env:
-          ACFUN_USERNAME: ${{ secrets.ACFUN_USERNAME }}
-          ACFUN_PASSWORD: ${{ secrets.ACFUN_PASSWORD }}
+      #- name: acfun.cn
+      # run: npm run serve:acfun
+      #env:
+      # ACFUN_USERNAME: ${{ secrets.ACFUN_USERNAME }}
+      #ACFUN_PASSWORD: ${{ secrets.ACFUN_PASSWORD }}
 
       - name: bilibili.com
         run: npm run serve:bilibili

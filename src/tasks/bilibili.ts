@@ -1,4 +1,5 @@
 import cookie from 'cookie'
+import dayjs from 'dayjs'
 import puppeteer from 'puppeteer'
 import CONFIG from '../config'
 import { bot } from '../utils'
@@ -30,12 +31,37 @@ async function bootstrap() {
   await page.goto('https://account.bilibili.com/account/coin', {
     waitUntil: 'domcontentloaded'
   })
-  await bot.text(`bilibili 签到 => 成功`)
+
+  const res = await page.waitForResponse(
+    'https://api.bilibili.com/x/member/web/coin/log?jsonp=jsonp'
+  )
+  const result: any = await res.json()
+  if (result.code) {
+    return Promise.reject(result.message)
+  }
+  const records = result.data.list
+
+  const isCheckedIn = records.some(
+    (record: any) =>
+      record.reason === '登录奖励' && dayjs().isSame(record.time, 'day')
+  )
+  let msg
+  if (isCheckedIn) {
+    msg = '已签到'
+  } else {
+    msg = '成功'
+  }
   await browser.close()
+  return msg
 }
 
-bootstrap().catch(async err => {
-  console.log(err)
-  await bot.text(`bilibili 签到 => 错误 \n ${err?.message ?? err}`)
-  process.exit(0)
-})
+bootstrap()
+  .then(async msg => {
+    console.log('success')
+    await bot.text(`bilibili 签到✔ => ${msg}`)
+  })
+  .catch(async err => {
+    console.log('error', err)
+    await bot.text(`bilibili 签到❌ => 错误 \n ${err?.message ?? err}`)
+    process.exit(0)
+  })

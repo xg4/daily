@@ -30,22 +30,29 @@ async function bootstrap() {
   }
   await page.goto('https://www.acfun.cn/member/')
   await page.click('#btn-sign-user')
+  let msg
   try {
     const checkInBtn = await page.waitForSelector(
       '#sign-content > div.sign-in-web'
     )
     await checkInBtn.click()
-    await bot.text('acfun 签到 => 成功')
+    msg = '成功'
   } catch {
     // 已签到
-    await bot.text('acfun 签到 => 已签到')
+    msg = '已签到'
   }
 
   await browser.close()
+  return msg
 }
 
-bootstrap().catch(async err => {
-  console.log(err)
-  await bot.text(`acfun 签到 => 错误 \n ${err?.message ?? err}`)
-  process.exit(0)
-})
+bootstrap()
+  .then(async msg => {
+    console.log('success')
+    await bot.text(`acfun 签到 => ${msg}`)
+  })
+  .catch(async err => {
+    console.log('error', err)
+    await bot.text(`acfun 签到 => 错误 \n ${err?.message ?? err}`)
+    process.exit(0)
+  })

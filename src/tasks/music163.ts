@@ -23,12 +23,17 @@ async function bootstrap() {
     '#discover-module > div.g-sd1 > div.n-myinfo.s-bg.s-bg-5 > div > div > div > a'
   )
   await checkInBtn.click()
-  await bot.text(`music.163 签到 => 成功`)
+
   await browser.close()
 }
 
-bootstrap().catch(async err => {
-  console.log(err)
-  await bot.text(`music.163 签到 => 错误 \n ${err?.message ?? err}`)
-  process.exit(0)
-})
+bootstrap()
+  .then(async () => {
+    console.log('success')
+    await bot.text(`music.163 签到 => 成功`)
+  })
+  .catch(async err => {
+    console.log('error', err)
+    await bot.text(`music.163 签到 => 错误 \n ${err?.message ?? err}`)
+    process.exit(0)
+  })

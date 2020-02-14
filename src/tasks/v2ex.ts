@@ -30,12 +30,16 @@ async function bootstrap() {
     waitUntil: 'domcontentloaded'
   })
   await page.click('#Main > div.box > div:nth-child(2) > input')
-  await bot.text(`v2ex 签到 => 成功`)
   await browser.close()
 }
 
-bootstrap().catch(async err => {
-  console.log(err)
-  await bot.text(`v2ex 签到 => 错误 \n ${err?.message ?? err}`)
-  process.exit(0)
-})
+bootstrap()
+  .then(async () => {
+    console.log('success')
+    await bot.text(`v2ex 签到 => 成功`)
+  })
+  .catch(async err => {
+    console.log('error', err)
+    await bot.text(`v2ex 签到 => 错误 \n ${err?.message ?? err}`)
+    process.exit(0)
+  })

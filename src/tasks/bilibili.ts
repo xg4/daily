@@ -45,14 +45,12 @@ async function bootstrap() {
     (record: any) =>
       record.reason === '登录奖励' && dayjs().isSame(record.time, 'day')
   )
-  let msg
-  if (isCheckedIn) {
-    msg = '已签到'
-  } else {
-    msg = '成功'
-  }
   await browser.close()
-  return msg
+
+  if (isCheckedIn) {
+    return '已签到'
+  }
+  return '签到成功'
 }
 
 bootstrap()

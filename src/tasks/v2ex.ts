@@ -51,7 +51,7 @@ async function bootstrap() {
   if (isCheckedIn) {
     return '已签到'
   }
-  return '成功'
+  return Promise.reject('签到失败，未找到记录')
 }
 
 bootstrap()

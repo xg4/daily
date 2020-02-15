@@ -1,8 +1,8 @@
 import cookie from 'cookie'
 import dayjs from 'dayjs'
 import puppeteer from 'puppeteer'
+import { bot } from '../'
 import CONFIG from '../config'
-import { bot } from '../utils'
 
 async function bootstrap() {
   const browser = await puppeteer.launch({

@@ -9,6 +9,10 @@ jobs:
   check-in:
     runs-on: ubuntu-latest
 
+    env:
+      DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
+      DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -32,21 +36,15 @@ jobs:
       - name: bilibili.com
         run: npm run serve:bilibili
         env:
-          BOT_WEBHOOK: ${{ secrets.BOT_WEBHOOK }}
-          BOT_SECRET: ${{ secrets.BOT_SECRET }}
           BILIBILI_COOKIE: ${{ secrets.BILIBILI_COOKIE }}
 
       - name: music.163.com
         run: npm run serve:music163
         env:
-          BOT_WEBHOOK: ${{ secrets.BOT_WEBHOOK }}
-          BOT_SECRET: ${{ secrets.BOT_SECRET }}
           MUSIC163_USERNAME: ${{ secrets.MUSIC163_USERNAME }}
           MUSIC163_PASSWORD: ${{ secrets.MUSIC163_PASSWORD }}
 
       - name: v2ex.com
         run: npm run serve:v2ex
         env:
-          BOT_WEBHOOK: ${{ secrets.BOT_WEBHOOK }}
-          BOT_SECRET: ${{ secrets.BOT_SECRET }}
           V2EX_COOKIE: ${{ secrets.V2EX_COOKIE }}

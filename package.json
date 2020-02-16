@@ -52,7 +52,7 @@
     ]
   },
   "dependencies": {
-    "@xg4/dingtalk-bot": "^0.0.1",
+    "@xg4/dingtalk-bot": "^0.0.3",
     "cookie": "^0.4.0",
     "dayjs": "^1.8.20",
     "dotenv": "^8.2.0",

@@ -256,10 +256,10 @@
     semver "^6.3.0"
     tsutils "^3.17.1"
 
-"@xg4/dingtalk-bot@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@xg4/dingtalk-bot/-/dingtalk-bot-0.0.1.tgz#f1073bf436685eef171d55616f067661d3028bda"
-  integrity sha512-QVoGXs9tDu6BlRO8rl5FHOBsZV+xvRWRP9QTlInypxogIArHGyDYdyUoqTRUyUCGiqGK4j+bxDgshMxwxoqSoA==
+"@xg4/dingtalk-bot@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@xg4/dingtalk-bot/-/dingtalk-bot-0.0.3.tgz#9ba6397281affd6dbdb20e74aa14d62d234e9f60"
+  integrity sha512-wafGpvVVOJF5uNG55j0iNa1RpzeTWVixbpfqgIj2vp/Cfnz7UiZcqsZM8m3oZaaiLgFdrZxLLxNsCU7/8g4rUg==
   dependencies:
     node-fetch "^2.6.0"
 

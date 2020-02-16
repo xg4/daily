@@ -8,7 +8,7 @@ export const bot = new Bot(CONFIG.DINGTALK_WEBHOOK, CONFIG.DINGTALK_SECRET)
 async function bootstrap() {
   const browser = await puppeteer.launch({
     ignoreHTTPSErrors: true,
-    headless: false,
+    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
   const [page] = await browser.pages()
@@ -25,9 +25,9 @@ async function bootstrap() {
     try {
       msg = await task(page)
       msg = '🙆🏻‍♀️ ' + msg
-      console.log('成功🙆🏻‍♀️')
+      console.log(`${task.name} 成功 🙆🏻‍♀️`)
     } catch (err) {
-      console.log('失败🙅🏻‍♀️', err)
+      console.log(`${task.name} 失败 🙅🏻‍♀️`, err)
       msg = err?.message ?? err
       msg = '🙅🏻‍♀️ ' + msg
     }

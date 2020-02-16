@@ -9,10 +9,6 @@ jobs:
   check-in:
     runs-on: ubuntu-latest
 
-    env:
-      DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
-      DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -27,24 +23,12 @@ jobs:
       - name: Install
         run: yarn
 
-      - name: acfun.cn
-        run: npm run serve:acfun
+      - name: Check In
+        run: npm run serve
         env:
-          ACFUN_USERNAME: ${{ secrets.ACFUN_USERNAME }}
-          ACFUN_PASSWORD: ${{ secrets.ACFUN_PASSWORD }}
-
-      - name: bilibili.com
-        run: npm run serve:bilibili
-        env:
+          DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
+          DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
+          ACFUN_COOKIE: ${{ secrets.ACFUN_COOKIE }}
           BILIBILI_COOKIE: ${{ secrets.BILIBILI_COOKIE }}
-
-      - name: music.163.com
-        run: npm run serve:music163
-        env:
-          MUSIC163_USERNAME: ${{ secrets.MUSIC163_USERNAME }}
-          MUSIC163_PASSWORD: ${{ secrets.MUSIC163_PASSWORD }}
-
-      - name: v2ex.com
-        run: npm run serve:v2ex
-        env:
+          MUSIC163_COOKIE: ${{ secrets.MUSIC163_COOKIE }}
           V2EX_COOKIE: ${{ secrets.V2EX_COOKIE }}

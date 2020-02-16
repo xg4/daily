@@ -19,6 +19,7 @@ export default async function acfun(page: puppeteer.Page) {
     return '已签到'
   }
 
+  await page.click('#btn-sign-user')
   const checkInBtn = await page.waitForSelector(
     '#sign-content > div.sign-in-web'
   )

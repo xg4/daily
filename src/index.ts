@@ -24,11 +24,11 @@ async function bootstrap() {
   for (const task of Object.values(tasks)) {
     try {
       const msg = await task(page)
-      console.log(`${task.name} 成功 🙆🏻‍♀️`)
-      messages.push(`🙆🏻‍♀️ **${task.name}** ${msg}`)
+      console.log(`✅ ${task.name} 成功`)
+      messages.push(`✅ **${task.name}** => ${msg}`)
     } catch (err) {
-      console.log(`${task.name} 失败 🙅🏻‍♀️`, err)
-      messages.push(`🙅🏻‍♀️ *${task.name}* ${err?.message ?? err}`)
+      console.log(`❎ ${task.name} 失败`, err)
+      messages.push(`❎ *${task.name}* => ${err?.message ?? err}`)
     }
   }
   await browser.close()

@@ -30,12 +30,12 @@ export default async function v2ex(page: puppeteer.Page) {
     '#Main > div.box > div:nth-child(4) > table > tbody > tr',
     els => els.map(el => el.textContent?.split('\n') ?? [])
   )
-  const isCheckedIn = records.some(
+  const isCheckedIn = records.find(
     ([_, date, type]) => dayjs().isSame(date, 'day') && type === '每日登录奖励'
   )
 
   if (isCheckedIn) {
-    return '已签到'
+    return `${isCheckedIn[1]} 已签到`
   }
   return Promise.reject('签到失败，未找到记录')
 }

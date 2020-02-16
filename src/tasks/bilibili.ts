@@ -25,15 +25,14 @@ export default async function bilibili(page: puppeteer.Page) {
   if (result.code) {
     return Promise.reject(result.message)
   }
-  const records = result.data.list
+  const records: any[] = result.data.list
 
-  const isCheckedIn = records.some(
-    (record: any) =>
-      record.reason === '登录奖励' && dayjs().isSame(record.time, 'day')
+  const isCheckedIn = records.find(
+    record => record.reason === '登录奖励' && dayjs().isSame(record.time, 'day')
   )
 
   if (isCheckedIn) {
-    return '已签到'
+    return `${isCheckedIn.time} 已签到`
   }
   return '签到成功'
 }

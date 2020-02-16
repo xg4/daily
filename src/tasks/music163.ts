@@ -1,39 +1,25 @@
+import cookie from 'cookie'
 import puppeteer from 'puppeteer'
-import { bot } from '../'
 import CONFIG from '../config'
 
-async function bootstrap() {
-  const browser = await puppeteer.launch({
-    ignoreHTTPSErrors: true,
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  })
-  const [page] = await browser.pages()
-  await page.setViewport({ width: 1200, height: 900 })
+export default async function music163(page: puppeteer.Page) {
   await page.goto('https://music.163.com/')
+  const jar = cookie.parse(CONFIG.MUSIC163_COOKIE)
+  const cookies = Object.entries(jar).map(([name, value]) => ({
+    name,
+    value,
+    domain: '.music.163.com'
+  }))
+  await page.setCookie(...cookies)
+  await page.reload()
   const [_, frame] = await page.frames()
-  const loginBtn = await frame.waitForSelector('#index-enter-default')
-  await loginBtn.click()
-  await page.click('#j-official-terms')
-  await page.click('.zcnt div.u-main > div:nth-child(2) > a')
-  await page.type('#p', CONFIG.MUSIC163_USERNAME)
-  await page.type('#pw', CONFIG.MUSIC163_PASSWORD)
-  await page.click('.zcnt div.n-log2.n-log2-2 > div.f-mgt20 > a')
-  const checkInBtn = await frame.waitForSelector(
+  const selector =
     '#discover-module > div.g-sd1 > div.n-myinfo.s-bg.s-bg-5 > div > div > div > a'
-  )
+  const checkInBtn = await frame.waitForSelector(selector)
+  const checkInText = await frame.$eval(selector, el => el.textContent)
+  if (checkInText?.trim() === '已签到') {
+    return '已签到'
+  }
   await checkInBtn.click()
-
-  await browser.close()
+  return '签到成功'
 }
-
-bootstrap()
-  .then(async () => {
-    console.log('success')
-    await bot.text(`music.163 签到 => 成功`)
-  })
-  .catch(async err => {
-    console.log('error', err)
-    await bot.text(`music.163 签到 => 错误 \n ${err?.message ?? err}`)
-    process.exit(0)
-  })

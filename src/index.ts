@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer'
 import CONFIG from './config'
 import * as tasks from './tasks'
 
-export const bot = new Bot(CONFIG.DINGTALK_WEBHOOK, CONFIG.DINGTALK_SECRET)
+const bot = new Bot(CONFIG.DINGTALK_WEBHOOK, CONFIG.DINGTALK_SECRET)
 
 async function bootstrap() {
   const browser = await puppeteer.launch({
@@ -19,23 +19,23 @@ async function bootstrap() {
     if (/\.(png|jpe?g|gif)$/i.test(url)) interceptedRequest.abort()
     else interceptedRequest.continue()
   })
+
+  const messages = []
   for (const task of Object.values(tasks)) {
-    console.log(task.name)
-    let msg
     try {
-      msg = await task(page)
-      msg = '🙆🏻‍♀️ ' + msg
+      const msg = await task(page)
       console.log(`${task.name} 成功 🙆🏻‍♀️`)
+      messages.push(`🙆🏻‍♀️ **${task.name}** ${msg}`)
     } catch (err) {
       console.log(`${task.name} 失败 🙅🏻‍♀️`, err)
-      msg = err?.message ?? err
-      msg = '🙅🏻‍♀️ ' + msg
+      messages.push(`🙅🏻‍♀️ *${task.name}* ${err?.message ?? err}`)
     }
-
-    await bot.text(`${task.name} 签到 => ${msg}`)
   }
-
   await browser.close()
+  await bot.markdown({
+    title: '签到',
+    text: messages.join('  \n')
+  })
 }
 
 bootstrap()

@@ -3,7 +3,7 @@ name: Daily Tasks
 on:
   push:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 * * * *'
 
 jobs:
   check-in:
@@ -32,3 +32,4 @@ jobs:
           BILIBILI_COOKIE: ${{ secrets.BILIBILI_COOKIE }}
           MUSIC163_COOKIE: ${{ secrets.MUSIC163_COOKIE }}
           V2EX_COOKIE: ${{ secrets.V2EX_COOKIE }}
+          DOUYU_COOKIE: ${{ secrets.DOUYU_COOKIE }}

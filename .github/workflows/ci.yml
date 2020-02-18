@@ -33,3 +33,4 @@ jobs:
           MUSIC163_COOKIE: ${{ secrets.MUSIC163_COOKIE }}
           V2EX_COOKIE: ${{ secrets.V2EX_COOKIE }}
           DOUYU_COOKIE: ${{ secrets.DOUYU_COOKIE }}
+          EGAME_COOKIE: ${{ secrets.EGAME_COOKIE}}

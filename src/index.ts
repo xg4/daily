@@ -12,7 +12,7 @@ async function bootstrap() {
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
   const [page] = await browser.pages()
-  await page.setViewport({ width: 1200, height: 900 })
+  await page.setViewport({ width: 1920, height: 900 })
   await page.setRequestInterception(true)
   page.on('request', interceptedRequest => {
     const url = interceptedRequest.url()
@@ -25,10 +25,10 @@ async function bootstrap() {
     try {
       const msg = await task(page)
       console.log(`✅ ${task.name} 成功`)
-      messages.push(`✅ **${task.name}** => ${msg}`)
+      messages.push(`✅ ${task.name} => ${msg}`)
     } catch (err) {
       console.log(`❎ ${task.name} 失败`, err)
-      messages.push(`❎ *${task.name}* => ${err?.message ?? err}`)
+      messages.push(`❎ **${task.name}** => ${err?.message ?? err}`)
     }
   }
   await browser.close()

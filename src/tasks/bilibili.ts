@@ -22,10 +22,11 @@ export default async function bilibili(page: puppeteer.Page) {
     '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2)'
   )
   try {
+    // hover 之后会有 .4s 的动画
     const checkInBtn = await page.waitForSelector(
       '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2) > div > div > div.calendar-checkin.p-absolute.ts-dot-4.panel-shadow.over-hidden.slot-component > div > div > div.checkin-btn.t-center.pointer',
       {
-        timeout: 3000
+        timeout: 1000
       }
     )
     checkInBtn.click()

@@ -14,6 +14,26 @@ export default async function bilibili(page: puppeteer.Page) {
     domain: '.bilibili.com'
   }))
   await page.setCookie(...cookies)
+  // 直播签到
+  await page.goto(
+    'https://link.bilibili.com/p/center/index?visit_id=bdkl86he4so0#/user-center/my-info/operation'
+  )
+  await page.hover(
+    '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2)'
+  )
+  try {
+    const checkInBtn = await page.waitForSelector(
+      '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2) > div > div > div.calendar-checkin.p-absolute.ts-dot-4.panel-shadow.over-hidden.slot-component > div > div > div.checkin-btn.t-center.pointer',
+      {
+        timeout: 3000
+      }
+    )
+    checkInBtn.click()
+  } catch {
+    // 已签到
+  }
+
+  // 主站签到
   await page.goto('https://account.bilibili.com/account/coin', {
     waitUntil: 'domcontentloaded'
   })

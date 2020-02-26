@@ -18,18 +18,22 @@ export default async function bilibili(page: puppeteer.Page) {
   await page.goto(
     'https://link.bilibili.com/p/center/index?visit_id=bdkl86he4so0#/user-center/my-info/operation'
   )
-  await page.hover(
+  const checkInEl = await page.waitForSelector(
     '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2)'
   )
+  await checkInEl.hover()
+
   try {
     // hover 之后会有 .4s 的动画
-    const checkInBtn = await page.waitForSelector(
+    await page.waitForSelector(
       '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2) > div > div > div.calendar-checkin.p-absolute.ts-dot-4.panel-shadow.over-hidden.slot-component > div > div > div.checkin-btn.t-center.pointer',
       {
         timeout: 1000
       }
     )
-    checkInBtn.click()
+    await page.click(
+      '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2) > div > div > div.calendar-checkin.p-absolute.ts-dot-4.panel-shadow.over-hidden.slot-component > div > div > div.checkin-btn.t-center.pointer'
+    )
   } catch {
     // 已签到
   }

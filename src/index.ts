@@ -14,10 +14,12 @@ async function bootstrap() {
   const [page] = await browser.pages()
   await page.setViewport({ width: 1920, height: 1080 })
   await page.setRequestInterception(true)
-  page.on('request', interceptedRequest => {
-    if (interceptedRequest.resourceType() === 'image')
-      interceptedRequest.abort()
-    else interceptedRequest.continue()
+  page.on('request', async interceptedRequest => {
+    if (interceptedRequest.resourceType() === 'image') {
+      await interceptedRequest.abort()
+    } else {
+      await interceptedRequest.continue()
+    }
   })
 
   const messages = []

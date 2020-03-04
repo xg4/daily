@@ -15,49 +15,35 @@ export default async function bilibili(page: puppeteer.Page) {
   }))
   await page.setCookie(...cookies)
   // 直播签到
-  await page.goto(
-    'https://link.bilibili.com/p/center/index?visit_id=bdkl86he4so0#/user-center/my-info/operation'
+  const liveCheckInData = await page.evaluate(() =>
+    fetch('https://api.live.bilibili.com/sign/doSign', {
+      method: 'GET',
+      credentials: 'include'
+    }).then(res => res.json())
   )
-  const checkInEl = await page.waitForSelector(
-    '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2)'
-  )
-  await checkInEl.hover()
-
-  try {
-    // hover 之后会有 .4s 的动画
-    await page.waitForSelector(
-      '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2) > div > div > div.calendar-checkin.p-absolute.ts-dot-4.panel-shadow.over-hidden.slot-component > div > div > div.checkin-btn.t-center.pointer',
-      {
-        timeout: 1000
-      }
-    )
-    await page.click(
-      '#live-center-app > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2) > div > div > div.calendar-checkin.p-absolute.ts-dot-4.panel-shadow.over-hidden.slot-component > div > div > div.checkin-btn.t-center.pointer'
-    )
-  } catch {
-    // 已签到
+  let liveMessage = 'live: '
+  if (liveCheckInData.code && liveCheckInData.code !== 1011040) {
+    liveMessage += liveCheckInData.message
+  } else {
+    liveMessage += '签到成功'
   }
 
-  // 主站签到
-  await page.goto('https://account.bilibili.com/account/coin', {
-    waitUntil: 'domcontentloaded'
-  })
-
-  const res = await page.waitForResponse(
-    'https://api.bilibili.com/x/member/web/coin/log?jsonp=jsonp'
+  const checkInResult = await page.evaluate(() =>
+    fetch('https://api.bilibili.com/x/member/web/coin/log?jsonp=jsonp', {
+      method: 'GET',
+      credentials: 'include'
+    }).then(res => res.json())
   )
-  const result: any = await res.json()
-  if (result.code) {
-    return Promise.reject(result.message)
+  if (checkInResult.code) {
+    return Promise.reject(checkInResult.message)
   }
-  const records: any[] = result.data.list
-
+  const records: any[] = checkInResult.data.list
   const isCheckedIn = records.find(
     record => record.reason === '登录奖励' && dayjs().isSame(record.time, 'day')
   )
 
   if (isCheckedIn) {
-    return `${isCheckedIn.time} 已签到`
+    return `${isCheckedIn.time} 已签到  \n ${liveMessage}`
   }
-  return '签到成功'
+  return '签到成功  \n' + liveMessage
 }

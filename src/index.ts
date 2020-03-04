@@ -25,19 +25,21 @@ async function bootstrap() {
   const messages = []
   for (const task of Object.values(tasks)) {
     try {
-      const msg = await task(page)
+      await task(page)
       console.log(`✅ ${task.name} 成功`)
-      messages.push(`✅ ${task.name} => ${msg}`)
+      // messages.push(`✅ ${task.name} => ${msg}`)
     } catch (err) {
       console.log(`❎ ${task.name} 失败`, err)
       messages.push(`❎ **${task.name}** => ${err?.message ?? err}`)
     }
   }
   await browser.close()
-  await bot.markdown({
-    title: '签到',
-    text: messages.join('  \n')
-  })
+  if (messages.length) {
+    await bot.markdown({
+      title: '签到',
+      text: messages.join('  \n')
+    })
+  }
 }
 
 bootstrap()

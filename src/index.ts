@@ -25,7 +25,8 @@ async function bootstrap() {
   const messages = []
   for (const task of Object.values(tasks)) {
     try {
-      await task(page)
+      // retry
+      await task(page).catch(() => task(page))
       console.log(`✅ ${task.name} 成功`)
       // messages.push(`✅ ${task.name} => ${msg}`)
     } catch (err) {

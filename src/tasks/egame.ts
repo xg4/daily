@@ -13,10 +13,9 @@ export default async function egame(page: puppeteer.Page) {
   await page.setCookie(...cookies)
 
   await page.goto('https://egame.qq.com/usercenter/userinfo')
-  await page.click(
-    '#__layout > div > div.user-wrap > div.user-center > div.nav > div.nav-bd > ul:nth-child(3) > li > a'
-  )
 
+  // 任务中心
+  await page.click('.icon-task')
   await page.waitForSelector('.task-detail')
 
   const hideBtnArr = await page.$$('.task-detail .icon-down')
@@ -44,10 +43,11 @@ export default async function egame(page: puppeteer.Page) {
     await btn.click()
   }
 
-  await page.click(
-    'body > div.gui-common-dialog.show > div.dialog-task > div.content > div.cnt-top > div:nth-child(1) > button'
-  )
-  await page.click('div.btn-cnt > button')
+  await page.reload()
+
+  // 签到
+  await page.click('.sign-enter')
+  await page.click('.btn-cnt > button')
 
   return '签到成功'
 }

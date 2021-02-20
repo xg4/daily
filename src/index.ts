@@ -1,6 +1,6 @@
+import retry from 'async-retry'
 import puppeteer from 'puppeteer'
 import * as tasks from './tasks'
-import retry from 'async-retry'
 
 async function main() {
   const browser = await puppeteer.launch({

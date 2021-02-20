@@ -10,5 +10,5 @@ export default {
   V2EX_COOKIE: process.env.V2EX_COOKIE ?? '',
   BILIBILI_COOKIE: process.env.BILIBILI_COOKIE ?? '',
   DOUYU_COOKIE: process.env.DOUYU_COOKIE ?? '',
-  EGAME_COOKIE: process.env.EGAME_COOKIE ?? ''
+  EGAME_COOKIE: process.env.EGAME_COOKIE ?? '',
 }

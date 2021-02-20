@@ -19,17 +19,17 @@ export default async function douyu(page: puppeteer.Page) {
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,
-    domain: '.douyu.com'
+    domain: '.douyu.com',
   }))
   await page.setCookie(...cookies)
 
   const [_, res] = await Promise.all([
     await page.goto('https://www.douyu.com/directory/myFollow'),
-    await page.waitForResponse(res =>
+    await page.waitForResponse((res) =>
       res
         .url()
         .startsWith('https://www.douyu.com/wgapi/livenc/liveweb/follow/list')
-    )
+    ),
   ])
 
   const data: any = await res.json()

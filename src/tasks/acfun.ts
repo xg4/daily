@@ -8,12 +8,12 @@ export default async function acfun(page: puppeteer.Page) {
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,
-    domain: '.acfun.cn'
+    domain: '.acfun.cn',
   }))
   await page.setCookie(...cookies)
 
   await page.goto('https://www.acfun.cn/member/')
-  const checkInText = await page.$eval('#btn-sign-user', el => el.textContent)
+  const checkInText = await page.$eval('#btn-sign-user', (el) => el.textContent)
 
   if (checkInText === '已签到') {
     return '已签到'

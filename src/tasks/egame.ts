@@ -29,7 +29,7 @@ export default async function egame(page: puppeteer.Page) {
       await btn.click()
       try {
         const maskBtn = await page.waitForSelector('.get-gift .gui-mask')
-        await maskBtn.click()
+        await maskBtn?.click()
       } catch {
         // mask
       }

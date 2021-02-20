@@ -1,19 +1,18 @@
-name: Daily Tasks
+name: schedule
 
 on:
-  push:
   schedule:
     - cron: '0 * * * *'
 
 jobs:
-  check-in:
+  daily:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
-          fetch-depth: 5
+          fetch-depth: 2
 
       - name: Setup Node
         uses: actions/setup-node@v1
@@ -23,7 +22,7 @@ jobs:
       - name: Install
         run: yarn
 
-      - name: Check In
+      - name: Serve
         run: npm run serve
         env:
           DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}

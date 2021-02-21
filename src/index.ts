@@ -13,7 +13,6 @@ async function main() {
 
   for (const task of Object.values(tasks)) {
     try {
-      // retry
       await retry(() => task(page), {
         retries: 2,
       })

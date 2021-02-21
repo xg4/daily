@@ -49,5 +49,6 @@ export default async function egame(page: puppeteer.Page) {
   )
   await daily?.click()
 
+  // watch
   await page.waitForTimeout(30 * 60 * 1e3)
 }

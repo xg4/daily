@@ -3,4 +3,4 @@
 // export { default as douyu } from './douyu'
 export { default as egame } from './egame'
 // export { default as music163 } from './music163'
-// export { default as v2ex } from './v2ex'
+export { default as v2ex } from './v2ex'

@@ -1,12 +1,8 @@
 import cookie from 'cookie'
-import dayjs from 'dayjs'
 import puppeteer from 'puppeteer'
 import CONFIG from '../config'
 
 export default async function bilibili(page: puppeteer.Page) {
-  await page.goto('https://www.bilibili.com/', {
-    waitUntil: 'domcontentloaded',
-  })
   const jar = cookie.parse(CONFIG.BILIBILI_COOKIE)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
@@ -14,37 +10,28 @@ export default async function bilibili(page: puppeteer.Page) {
     domain: '.bilibili.com',
   }))
   await page.setCookie(...cookies)
-  // 直播签到
-  const liveCheckInData = await page.evaluate(() =>
-    fetch('https://api.live.bilibili.com/sign/doSign', {
-      method: 'GET',
-      credentials: 'include',
-    }).then((res) => res.json())
-  )
-  let liveMessage = 'live: '
-  if (liveCheckInData.code && liveCheckInData.code !== 1011040) {
-    liveMessage += liveCheckInData.message
-  } else {
-    liveMessage += '签到成功'
-  }
+  await page.goto('https://www.bilibili.com/')
 
-  const checkInResult = await page.evaluate(() =>
-    fetch('https://api.bilibili.com/x/member/web/coin/log?jsonp=jsonp', {
-      method: 'GET',
-      credentials: 'include',
-    }).then((res) => res.json())
+  // main
+  const avatar = await page.waitForSelector(
+    '#internationalHeader > div.mini-header.m-header > div > div.nav-user-center > div.user-con.signin > div:nth-child(1) > span > div > div > div > img'
   )
-  if (checkInResult.code) {
-    return Promise.reject(checkInResult.message)
-  }
-  const records: any[] = checkInResult.data.list
-  const isCheckedIn = records.find(
-    (record) =>
-      record.reason === '登录奖励' && dayjs().isSame(record.time, 'day')
-  )
+  await avatar?.hover()
+  await page.waitForTimeout(2 * 1e3)
 
-  if (isCheckedIn) {
-    return `${isCheckedIn.time} 已签到  \n ${liveMessage}`
+  // live
+  await page.goto('https://live.bilibili.com/')
+  const navbar = await page.waitForSelector(
+    '#app > div.nav-ctnr > div > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2)'
+  )
+  await navbar?.hover()
+
+  await page.waitForTimeout(2 * 1e3)
+  try {
+    await page.click(
+      '#app > div.nav-ctnr > div > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2) > div > div > div.calendar-checkin.p-absolute.ts-dot-4.panel-shadow.over-hidden.slot-component > div > div > div.checkin-btn.t-center.pointer'
+    )
+  } catch {
+    // already checked in
   }
-  return '签到成功  \n' + liveMessage
 }

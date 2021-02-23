@@ -24,23 +24,17 @@ export default async function egame(page: puppeteer.Page) {
   }))
   await page.setCookie(...cookies)
 
-  await page.goto('https://egame.qq.com/77777')
-
-  const area = await page.waitForSelector(
-    '#__layout > div > div:nth-child(2) > div > div.gui-main > div.live-panel-player-bottom > div.panel-interactive > ul > li:nth-child(4)'
+  await page.goto('https://egame.qq.com/usercenter/userinfo')
+  const taskBtn = await page.waitForSelector(
+    '#__layout > div > div.user-wrap > div.user-center > div.nav > div.nav-bd > ul:nth-child(3) > li:nth-child(3) > a'
   )
-  await area?.hover()
+  await taskBtn?.click()
 
-  const task = await page.waitForSelector(
-    '#__layout > div > div:nth-child(2) > div > div.gui-main > div.live-panel-player-bottom > div.panel-interactive > ul > li:nth-child(4) > div > div.interactive-area-item > ul > li:nth-child(3)'
-  )
-  await task?.click()
-
-  const taskModal = await page.waitForSelector(
+  const list = await page.waitForSelector(
     'body > div.gui-common-dialog.dialog.show > div.dialog-checkin > div.content > ul'
   )
 
-  const items = (await taskModal?.$$('.btn-primary')) ?? []
+  const items = (await list?.$$('.btn-primary')) ?? []
 
   await receiveAward(page, items)
 
@@ -49,6 +43,6 @@ export default async function egame(page: puppeteer.Page) {
   )
   await daily?.click()
 
-  // watch
-  await page.waitForTimeout(30 * 60 * 1e3)
+  // await page.goto('https://egame.qq.com/77777')
+  // await page.waitForTimeout(30 * 60 * 1e3)
 }

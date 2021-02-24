@@ -24,12 +24,24 @@ export default async function egame(page: puppeteer.Page) {
   }))
   await page.setCookie(...cookies)
 
+  // 每日签到
+  await page.goto('https://egame.qq.com/usercenter/userinfo')
+  const taskTab = await page.waitForSelector(
+    '#__layout > div > div.user-wrap > div.user-center > div.nav > div.nav-bd > ul:nth-child(3) > li:nth-child(3) > a'
+  )
+  await taskTab?.click()
+
+  const dailyBtn = await page.waitForSelector(
+    'body > div.gui-common-dialog.dialog.show > div.dialog-checkin > div.bar > div:nth-child(1)'
+  )
+  await dailyBtn?.click()
+
+  // 日常任务
   await page.goto('https://egame.qq.com/usercenter/userinfo')
   const taskBtn = await page.waitForSelector(
     '#__layout > div > div.user-wrap > div.user-center > div.nav > div.nav-bd > ul:nth-child(3) > li:nth-child(3) > a'
   )
   await taskBtn?.click()
-
   const list = await page.waitForSelector(
     'body > div.gui-common-dialog.dialog.show > div.dialog-checkin > div.content > ul'
   )
@@ -37,12 +49,4 @@ export default async function egame(page: puppeteer.Page) {
   const items = (await list?.$$('.btn-primary')) ?? []
 
   await receiveAward(page, items)
-
-  const daily = await page.waitForSelector(
-    'body > div.gui-common-dialog.dialog.show > div.dialog-checkin > div.bar > div:nth-child(1)'
-  )
-  await daily?.click()
-
-  // await page.goto('https://egame.qq.com/77777')
-  // await page.waitForTimeout(30 * 60 * 1e3)
 }

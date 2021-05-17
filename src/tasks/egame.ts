@@ -1,6 +1,5 @@
 import cookie from 'cookie'
 import puppeteer from 'puppeteer'
-import CONFIG from '../config'
 
 async function receiveAward(
   page: puppeteer.Page,
@@ -16,7 +15,10 @@ async function receiveAward(
 }
 
 export default async function egame(page: puppeteer.Page) {
-  const jar = cookie.parse(CONFIG.EGAME_COOKIE)
+  if (!process.env.EGAME_COOKIE) {
+    return
+  }
+  const jar = cookie.parse(process.env.EGAME_COOKIE)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,

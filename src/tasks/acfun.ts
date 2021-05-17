@@ -1,9 +1,11 @@
 import cookie from 'cookie'
 import puppeteer from 'puppeteer'
-import CONFIG from '../config'
 
 export default async function acfun(page: puppeteer.Page) {
-  const jar = cookie.parse(CONFIG.ACFUN_COOKIE)
+  if (!process.env.ACFUN_COOKIE) {
+    return
+  }
+  const jar = cookie.parse(process.env.ACFUN_COOKIE)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,

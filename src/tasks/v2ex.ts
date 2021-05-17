@@ -1,9 +1,11 @@
 import cookie from 'cookie'
 import puppeteer from 'puppeteer'
-import CONFIG from '../config'
 
 export default async function v2ex(page: puppeteer.Page) {
-  const jar = cookie.parse(CONFIG.V2EX_COOKIE)
+  if (!process.env.V2EX_COOKIE) {
+    return
+  }
+  const jar = cookie.parse(process.env.V2EX_COOKIE)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,

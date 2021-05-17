@@ -1,6 +1,5 @@
 import cookie from 'cookie'
 import puppeteer from 'puppeteer'
-import CONFIG from '../config'
 
 async function checkIn(page: puppeteer.Page, id: number) {
   await page.goto(`https://www.douyu.com/${id}`)
@@ -14,8 +13,11 @@ async function checkIn(page: puppeteer.Page, id: number) {
 }
 
 export default async function douyu(page: puppeteer.Page) {
+  if (!process.env.DOUYU_COOKIE) {
+    return
+  }
   await page.goto('https://www.douyu.com/')
-  const jar = cookie.parse(CONFIG.DOUYU_COOKIE)
+  const jar = cookie.parse(process.env.DOUYU_COOKIE)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,
@@ -25,7 +27,7 @@ export default async function douyu(page: puppeteer.Page) {
 
   const [_, res] = await Promise.all([
     await page.goto('https://www.douyu.com/directory/myFollow'),
-    await page.waitForResponse((res) =>
+    await page.waitForResponse((res: any) =>
       res
         .url()
         .startsWith('https://www.douyu.com/wgapi/livenc/liveweb/follow/list')

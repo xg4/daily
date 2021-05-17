@@ -1,9 +1,11 @@
 import cookie from 'cookie'
 import puppeteer from 'puppeteer'
-import CONFIG from '../config'
 
 export default async function bilibili(page: puppeteer.Page) {
-  const jar = cookie.parse(CONFIG.BILIBILI_COOKIE)
+  if (!process.env.BILIBILI_COOKIE) {
+    return
+  }
+  const jar = cookie.parse(process.env.BILIBILI_COOKIE)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,

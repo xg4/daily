@@ -1,4 +1,5 @@
 import retry from 'async-retry'
+import dayjs from 'dayjs'
 import dotenv from 'dotenv'
 import puppeteer from 'puppeteer'
 import * as tasks from './tasks'
@@ -18,9 +19,9 @@ async function main() {
       await retry(() => task(page), {
         retries: 2,
       })
-      console.log(`Success: ${task.name}`)
+      console.log(`${dayjs().format('MM-DD HH:mm')} Success: ${task.name}`)
     } catch (err) {
-      console.log(`Fail: ${task.name} \n`, err)
+      console.log(`${dayjs().format('MM-DD HH:mm')} Fail: ${task.name} \n`, err)
     }
   }
   await browser.close()

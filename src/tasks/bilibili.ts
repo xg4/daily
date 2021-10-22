@@ -1,9 +1,25 @@
 import cookie from 'cookie'
 import puppeteer from 'puppeteer'
 
+interface DetailResult {
+  text: string
+  specialText: string
+  allDays: number
+  hadSignDays: number
+  isBonusDay: number
+}
+
+interface BiliResult {
+  // 0 成功
+  code: number
+  message: string
+  ttl: number
+  data: DetailResult | null
+}
+
 export default async function bilibili(page: puppeteer.Page) {
   if (!process.env.BILIBILI_COOKIE) {
-    return
+    throw new Error('Need cookie')
   }
   const jar = cookie.parse(process.env.BILIBILI_COOKIE)
   const cookies = Object.entries(jar).map(([name, value]) => ({
@@ -22,18 +38,11 @@ export default async function bilibili(page: puppeteer.Page) {
   await page.waitForTimeout(2 * 1e3)
 
   // live
-  await page.goto('https://live.bilibili.com/')
-  const navbar = await page.waitForSelector(
-    '#app > div.nav-ctnr > div > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2)'
-  )
-  await navbar?.hover()
+  await page.goto('https://live.bilibili.com/7777')
 
-  await page.waitForTimeout(2 * 1e3)
-  try {
-    await page.click(
-      '#app > div.nav-ctnr > div > nav > div > div.right-part.h-100.f-right.f-clear > div.shortcuts-ctnr.h-100.f-left > div:nth-child(2) > div > div > div.calendar-checkin.p-absolute.ts-dot-4.panel-shadow.over-hidden.slot-component > div > div > div.checkin-btn.t-center.pointer'
-    )
-  } catch {
-    // already checked in
-  }
+  await page.evaluate(async () =>
+    fetch('https://api.live.bilibili.com/xlive/web-ucenter/v1/sign/DoSign', {
+      credentials: 'include',
+    }).then((r) => r.json())
+  )
 }

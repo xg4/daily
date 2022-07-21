@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec npm run serve",
     "fmt": "prettier --write src",
-    "serve": "ts-node --files --transpile-only ./src/index.ts",
+    "serve": "ts-node ./src/index.ts",
     "start": "pm2 start ts-node -- --files --transpile-only ./src/index.ts"
   },
   "husky": {
@@ -32,11 +32,11 @@
     ],
     "*.{ts,tsx,js,jsx}": [
       "prettier --write",
-      "eslint --fix",
       "git add"
     ]
   },
   "dependencies": {
+    "@tsconfig/recommended": "1.0.1",
     "@types/async-retry": "^1.4.4",
     "@types/cookie": "^0.5.1",
     "@types/node": "^18.0.6",

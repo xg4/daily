@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@tsconfig/recommended': 1.0.1
   '@types/async-retry': ^1.4.4
   '@types/cookie': ^0.5.1
   '@types/node': ^18.0.6
@@ -17,6 +18,7 @@ specifiers:
   typescript: ^4.7.4
 
 dependencies:
+  '@tsconfig/recommended': 1.0.1
   '@types/async-retry': 1.4.4
   '@types/cookie': 0.5.1
   '@types/node': 18.0.6
@@ -73,6 +75,10 @@ packages:
 
   /@tsconfig/node16/1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
+    dev: false
+
+  /@tsconfig/recommended/1.0.1:
+    resolution: {integrity: sha512-2xN+iGTbPBEzGSnVp/Hd64vKJCJWxsi9gfs88x4PPMyEjHJoA3o5BY9r5OLPHIZU2pAQxkSAsJFqn6itClP8mQ==}
     dev: false
 
   /@types/async-retry/1.4.4:

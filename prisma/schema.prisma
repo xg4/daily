@@ -7,16 +7,18 @@ datasource db {
   url      = "file:./sqlite.db"
 }
 
-model User {
+model Task {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  email    String?   @unique
-  username String    @unique
+  name      String @unique
+  envPrefix String @unique @map("env_prefix")
+  domain    String
+
   accounts Account[]
 
-  @@map("users")
+  @@map("tasks")
 }
 
 model Account {
@@ -24,11 +26,12 @@ model Account {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  name      String
-  cookie    String?
-  banned    Boolean @default(false)
-  creator   User?   @relation(fields: [creatorId], references: [id])
-  creatorId Int?
+  cookie     String  @unique
+  pptrCookie String? @unique @map("pptr_cookie")
+  published  Boolean @default(false)
+
+  task   Task @relation(fields: [taskId], references: [id])
+  taskId Int  @map("task_id")
 
   @@map("accounts")
 }

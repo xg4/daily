@@ -12,12 +12,15 @@ async function checkIn(page: puppeteer.Page, id: number) {
   }
 }
 
-export default async function douyu(page: puppeteer.Page) {
-  if (!process.env.DOUYU_COOKIE) {
+export default async function douyu(
+  page: puppeteer.Page,
+  cookieValue?: string
+) {
+  if (!cookieValue) {
     return
   }
   await page.goto('https://www.douyu.com/')
-  const jar = cookie.parse(process.env.DOUYU_COOKIE)
+  const jar = cookie.parse(cookieValue)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,

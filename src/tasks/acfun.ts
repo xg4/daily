@@ -10,11 +10,14 @@ interface AcFunResult {
   'host-name': string
 }
 
-export default async function acfun(page: puppeteer.Page) {
-  if (!process.env.ACFUN_COOKIE) {
+export default async function acfun(
+  page: puppeteer.Page,
+  cookieValue?: string
+) {
+  if (!cookieValue) {
     return
   }
-  const jar = cookie.parse(process.env.ACFUN_COOKIE)
+  const jar = cookie.parse(cookieValue)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,
@@ -24,9 +27,10 @@ export default async function acfun(page: puppeteer.Page) {
 
   await page.goto('https://www.acfun.cn/member/')
 
-  await page.evaluate(async () =>
+  const result = await page.evaluate(async () =>
     fetch('https://www.acfun.cn/rest/pc-direct/user/signIn').then((r) =>
       r.json()
     )
   )
+  console.log(result)
 }

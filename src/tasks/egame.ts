@@ -14,11 +14,14 @@ async function receiveAward(
   }
 }
 
-export default async function egame(page: puppeteer.Page) {
-  if (!process.env.EGAME_COOKIE) {
+export default async function egame(
+  page: puppeteer.Page,
+  cookieValue?: string
+) {
+  if (!cookieValue) {
     return
   }
-  const jar = cookie.parse(process.env.EGAME_COOKIE)
+  const jar = cookie.parse(cookieValue)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,

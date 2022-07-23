@@ -1,12 +1,15 @@
 import cookie from 'cookie'
 import puppeteer from 'puppeteer'
 
-export default async function music163(page: puppeteer.Page) {
-  if (!process.env.MUSIC163_COOKIE) {
+export default async function music163(
+  page: puppeteer.Page,
+  cookieValue?: string
+) {
+  if (!cookieValue) {
     return
   }
   await page.goto('https://music.163.com/')
-  const jar = cookie.parse(process.env.MUSIC163_COOKIE)
+  const jar = cookie.parse(cookieValue)
   const cookies = Object.entries(jar).map(([name, value]) => ({
     name,
     value,

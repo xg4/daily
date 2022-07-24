@@ -33,5 +33,20 @@ model Account {
   task   Task @relation(fields: [taskId], references: [id])
   taskId Int  @map("task_id")
 
+  records Record[]
+
   @@map("accounts")
+}
+
+model Record {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  accountId Int     @map("account_id")
+  account   Account @relation(fields: [accountId], references: [id])
+
+  content String
+
+  @@map("records")
 }

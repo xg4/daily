@@ -2,7 +2,7 @@ import { Task } from '@prisma/client'
 import dayjs from 'dayjs'
 import dotenv from 'dotenv'
 import { app, prisma } from './helpers'
-import * as fns from './tasks'
+import { taskHandlers } from './tasks'
 import { parseCookies } from './utils'
 
 dotenv.config()
@@ -53,7 +53,7 @@ async function main() {
   })
 
   tasks.forEach(async (t) => {
-    const handler = (fns as any)[t.name]
+    const handler = taskHandlers[t.name]
     if (!handler) {
       return
     }
@@ -63,11 +63,14 @@ async function main() {
         published: true,
         taskId: t.id,
       },
+      include: {
+        task: true,
+      },
     })
 
     accounts.forEach((account) => {
       app.use(async (ctx, next) => {
-        console.log(`[${t.name}] ${account.id}`)
+        console.log(`[${account.task.name}] ${account.id}`)
 
         let cookies: any
         if (account.pptrCookie) {
@@ -82,7 +85,13 @@ async function main() {
         if (cookies) {
           const page = await ctx.browser.newPage()
           await page.setCookie(...cookies)
-          await handler(page)
+          const result = await handler(page)
+          await prisma.record.create({
+            data: {
+              accountId: account.id,
+              content: result,
+            },
+          })
           const newCookies = await page.cookies()
           await prisma.account.update({
             where: {

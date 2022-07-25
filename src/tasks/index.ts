@@ -1,10 +1,8 @@
 import { TaskHandler } from '../types'
 
-// export { default as douyu } from './douyu'
-
 export const taskHandlers: Record<string, TaskHandler | undefined> = {
   bilibili: async function bilibili(page) {
-    await page.goto('https://live.bilibili.com/7777')
+    await page.goto('https://live.bilibili.com/')
     const result = await page.evaluate(async () =>
       fetch('https://api.live.bilibili.com/xlive/web-ucenter/v1/sign/DoSign', {
         credentials: 'include',
@@ -40,5 +38,37 @@ export const taskHandlers: Record<string, TaskHandler | undefined> = {
       )
     )
     return JSON.stringify(result)
+  },
+  music163: async function music163(page) {
+    await page.goto('https://music.163.com/')
+
+    const elementHandle = await page.waitForSelector('#g_iframe')
+    if (!elementHandle) {
+      throw new Error('not found #g_iframe')
+    }
+    const frame = await elementHandle.contentFrame()
+    if (!frame) {
+      throw new Error('not found frame')
+    }
+
+    const selector =
+      '#discover-module > div.g-sd1 > div.n-user-profile > div > div > div > div > a'
+    const checkInBtn = await frame.waitForSelector(selector)
+    const checkInText = await frame.$eval(selector, (el) => el.textContent)
+    if (!checkInBtn || !checkInText) {
+      throw new Error('not found checkInBtn or checkInText')
+    }
+    if (checkInText.trim() === '已签到') {
+      return '已签到'
+    }
+    await checkInBtn.click()
+    const result = await page
+      .waitForResponse((res) => {
+        return res.url
+          .toString()
+          .startsWith('https://music.163.com/weapi/point/dailyTask')
+      })
+      .then((r) => r.json())
+    return result
   },
 }

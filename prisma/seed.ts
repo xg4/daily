@@ -13,6 +13,16 @@ const taskData: Prisma.TaskCreateInput[] = [
     envPrefix: 'V2EX_COOKIE',
     domain: '.v2ex.com',
   },
+  {
+    name: 'music163',
+    envPrefix: 'MUSIC163_COOKIE',
+    domain: '.music.163.com',
+  },
+  {
+    name: 'acfun',
+    envPrefix: 'ACFUN_COOKIE',
+    domain: '.acfun.cn',
+  },
 ]
 
 async function main() {

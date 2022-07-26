@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import { prisma } from './helpers'
 import Application from './helpers/application'
-import { init, injectEnv, runtime } from './middleware'
+import { init, injectEnv, logger } from './middleware'
 import { project } from './tasks'
 
 dotenv.config()
@@ -21,7 +21,7 @@ async function main() {
     })
   }
 
-  app.use(runtime())
+  app.use(logger())
   app.use(init)
   app.use(injectEnv)
 

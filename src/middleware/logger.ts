@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { pad } from 'lodash'
 import type { Handler } from '../types'
 
-export function runtime(name = 'App'): Handler {
+export function logger(name = 'App'): Handler {
   return async (_, next) => {
     name = pad(name, 20, ' ')
     const now = Date.now()

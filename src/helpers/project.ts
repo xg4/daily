@@ -1,7 +1,7 @@
 import type { Prisma } from '@prisma/client'
 import retry from 'async-retry'
 import compose from 'koa-compose'
-import { injectCookie, runtime } from '../middleware'
+import { injectCookie, logger } from '../middleware'
 import type { AccountWithTask, Handler } from '../types'
 
 class Layer {
@@ -36,7 +36,7 @@ export default class Project {
     return accounts.map((account) => {
       return this.compose(
         account,
-        runtime(`${account.task.name} - ${account.id}`),
+        logger(`${account.task.name} - ${account.id}`),
         injectCookie(account)
       )
     })

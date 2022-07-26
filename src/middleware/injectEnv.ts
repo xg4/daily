@@ -26,7 +26,6 @@ export const injectEnv: Handler = async (_, next) => {
             data: {
               cookie,
               taskId: task.id,
-              published: true,
             },
           })
         })

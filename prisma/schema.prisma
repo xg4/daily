@@ -29,7 +29,6 @@ model Account {
 
   cookie     String  @unique
   pptrCookie String? @unique @map("pptr_cookie")
-  published  Boolean @default(false)
 
   task   Task @relation(fields: [taskId], references: [id])
   taskId Int  @map("task_id")

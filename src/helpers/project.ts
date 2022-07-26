@@ -3,6 +3,7 @@ import retry from 'async-retry'
 import compose from 'koa-compose'
 import { injectCookie, logger } from '../middleware'
 import type { AccountWithTask, Handler } from '../types'
+import { prisma } from './prisma'
 
 class Layer {
   name: string
@@ -19,8 +20,24 @@ class Layer {
 export default class Project {
   stack: Layer[] = []
 
-  register() {
-    return this.stack.map((s) => s.toJSON())
+  accounts: AccountWithTask[] = []
+
+  async register() {
+    const tasks = this.stack.map((s) => s.toJSON())
+    for (const t of tasks) {
+      await prisma.task.upsert({
+        where: {
+          name: t.name,
+        },
+        update: t,
+        create: t,
+      })
+    }
+    this.accounts = await prisma.account.findMany({
+      include: {
+        task: true,
+      },
+    })
   }
 
   use(opt: Prisma.TaskCreateInput, ...middleware: Handler[]) {
@@ -32,8 +49,8 @@ export default class Project {
     return this
   }
 
-  tasks(accounts: AccountWithTask[]) {
-    return accounts.map((account) => {
+  tasks() {
+    return this.accounts.map((account) => {
       return this.compose(
         account,
         logger(`${account.task.name} - ${account.id}`),

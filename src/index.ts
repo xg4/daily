@@ -9,29 +9,12 @@ dotenv.config()
 async function main() {
   const app = new Application()
 
-  const tasks = project.register()
-
-  for (const t of tasks) {
-    await prisma.task.upsert({
-      where: {
-        name: t.name,
-      },
-      update: t,
-      create: t,
-    })
-  }
-
   app.use(logger())
   app.use(init)
   app.use(injectEnv)
 
-  const accounts = await prisma.account.findMany({
-    include: {
-      task: true,
-    },
-  })
-
-  app.use(project.tasks(accounts))
+  await project.register()
+  app.use(project.tasks())
 
   await app.run()
 }

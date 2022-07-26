@@ -2,13 +2,14 @@ lockfileVersion: 5.4
 
 specifiers:
   '@prisma/client': 4.1.0
-  '@tsconfig/recommended': 1.0.1
+  '@tsconfig/node16-strictest': 1.0.3
   '@types/async-retry': ^1.4.4
   '@types/cookie': ^0.5.1
-  '@types/koa': 2.13.5
   '@types/koa-compose': 3.2.5
-  '@types/node': ^18.0.6
+  '@types/lodash': 4.14.182
+  '@types/node': ^18.6.1
   async-retry: ^1.3.3
+  chalk: 5.0.1
   cookie: ^0.5.0
   dayjs: ^1.11.4
   dotenv: ^16.0.1
@@ -19,26 +20,27 @@ specifiers:
   nodemon: ^2.0.19
   prettier: ^2.7.1
   prisma: 4.1.0
-  puppeteer: ^15.4.0
+  puppeteer: ^15.5.0
   ts-node: ^10.9.1
   typescript: ^4.7.4
 
 dependencies:
   '@prisma/client': 4.1.0_prisma@4.1.0
-  '@tsconfig/recommended': 1.0.1
+  '@tsconfig/node16-strictest': 1.0.3
   '@types/async-retry': 1.4.4
   '@types/cookie': 0.5.1
-  '@types/koa': 2.13.5
   '@types/koa-compose': 3.2.5
-  '@types/node': 18.0.6
+  '@types/lodash': 4.14.182
+  '@types/node': 18.6.1
   async-retry: 1.3.3
+  chalk: 5.0.1
   cookie: 0.5.0
   dayjs: 1.11.4
   dotenv: 16.0.1
   koa-compose: 4.1.0
   lodash: 4.17.21
-  puppeteer: 15.4.0
-  ts-node: 10.9.1_tdn3ypgnfy6bmey2q4hu5jonwi
+  puppeteer: 15.5.0
+  ts-node: 10.9.1_f6w67sjx3imwytyzb2qhabnzqe
   typescript: 4.7.4
 
 devDependencies:
@@ -107,18 +109,18 @@ packages:
     resolution: {integrity: sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==}
     dev: false
 
-  /@tsconfig/node16/1.0.3:
-    resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
+  /@tsconfig/node16-strictest/1.0.3:
+    resolution: {integrity: sha512-sY7TxE3BzAdsCuKqGWOTtAoPe4tPD0xlPWfjinJvrBvCulyALVSwvIoo7WMcX8O/WyMFzn9rQObA43mAogQ8MQ==}
     dev: false
 
-  /@tsconfig/recommended/1.0.1:
-    resolution: {integrity: sha512-2xN+iGTbPBEzGSnVp/Hd64vKJCJWxsi9gfs88x4PPMyEjHJoA3o5BY9r5OLPHIZU2pAQxkSAsJFqn6itClP8mQ==}
+  /@tsconfig/node16/1.0.3:
+    resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
     dev: false
 
   /@types/accepts/1.3.5:
     resolution: {integrity: sha512-jOdnI/3qTpHABjM5cx1Hc0sKsPoYCp+DP/GJRGtDlPd7fiV9oXGGIcjW/ZOxLIvjGz8MA+uMZI9metHlgqbgwQ==}
     dependencies:
-      '@types/node': 18.0.6
+      '@types/node': 18.6.1
     dev: false
 
   /@types/async-retry/1.4.4:
@@ -131,13 +133,13 @@ packages:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
       '@types/connect': 3.4.35
-      '@types/node': 18.0.6
+      '@types/node': 18.6.1
     dev: false
 
   /@types/connect/3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
-      '@types/node': 18.0.6
+      '@types/node': 18.6.1
     dev: false
 
   /@types/content-disposition/0.5.5:
@@ -154,13 +156,13 @@ packages:
       '@types/connect': 3.4.35
       '@types/express': 4.17.13
       '@types/keygrip': 1.0.2
-      '@types/node': 18.0.6
+      '@types/node': 18.6.1
     dev: false
 
   /@types/express-serve-static-core/4.17.29:
     resolution: {integrity: sha512-uMd++6dMKS32EOuw1Uli3e3BPgdLIXmezcfHv7N4c1s3gkhikBplORPpMq3fuWkxncZN1reb16d5n8yhQ80x7Q==}
     dependencies:
-      '@types/node': 18.0.6
+      '@types/node': 18.6.1
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
     dev: false
@@ -202,15 +204,19 @@ packages:
       '@types/http-errors': 1.8.2
       '@types/keygrip': 1.0.2
       '@types/koa-compose': 3.2.5
-      '@types/node': 18.0.6
+      '@types/node': 18.6.1
+    dev: false
+
+  /@types/lodash/4.14.182:
+    resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
     dev: false
 
   /@types/mime/1.3.2:
     resolution: {integrity: sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==}
     dev: false
 
-  /@types/node/18.0.6:
-    resolution: {integrity: sha512-/xUq6H2aQm261exT6iZTMifUySEt4GR5KX8eYyY+C4MSNPqSh9oNIP7tz2GLKTlFaiBbgZNxffoR3CVRG+cljw==}
+  /@types/node/18.6.1:
+    resolution: {integrity: sha512-z+2vB6yDt1fNwKOeGbckpmirO+VBDuQqecXkgeIqDlaOtmKn6hPR/viQ8cxCfqLU4fTlvM3+YjM367TukWdxpg==}
     dev: false
 
   /@types/qs/6.9.7:
@@ -229,14 +235,14 @@ packages:
     resolution: {integrity: sha512-nCkHGI4w7ZgAdNkrEu0bv+4xNV/XDqW+DydknebMOQwkpDGx8G+HTlj7R7ABI8i8nKxVw0wtKPi1D+lPOkh4YQ==}
     dependencies:
       '@types/mime': 1.3.2
-      '@types/node': 18.0.6
+      '@types/node': 18.6.1
     dev: false
 
   /@types/yauzl/2.10.0:
     resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
     requiresBuild: true
     dependencies:
-      '@types/node': 18.0.6
+      '@types/node': 18.6.1
     dev: false
     optional: true
 
@@ -249,8 +255,8 @@ packages:
     engines: {node: '>=0.4.0'}
     dev: false
 
-  /acorn/8.7.1:
-    resolution: {integrity: sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==}
+  /acorn/8.8.0:
+    resolution: {integrity: sha512-QOxyigPVrpZ2GXT+PFyZTl6TtOFc5egxHIP9IlQ+RbupQuX4RkT/Bee4/kQuC02Xkzg84JcT7oLYtDIQxp+v7w==}
     engines: {node: '>=0.4.0'}
     hasBin: true
     dev: false
@@ -366,6 +372,11 @@ packages:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
+    dev: false
+
+  /chalk/5.0.1:
+    resolution: {integrity: sha512-Fo07WOYGqMfCWHOzSXOt2CxDbC6skS/jO9ynEcmpANMoPrD+W1r1K6Vx7iNm+AQmETU1Xr2t+n8nzkV9t6xh3w==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
     dev: false
 
   /chokidar/3.5.3:
@@ -491,8 +502,8 @@ packages:
     dependencies:
       ms: 2.1.2
 
-  /devtools-protocol/0.0.1011705:
-    resolution: {integrity: sha512-OKvTvu9n3swmgYshvsyVHYX0+aPzCoYUnyXUacfQMmFtBtBKewV/gT4I9jkAbpTqtTi2E4S9MXLlvzBDUlqg0Q==}
+  /devtools-protocol/0.0.1019158:
+    resolution: {integrity: sha512-wvq+KscQ7/6spEV7czhnZc9RM/woz1AY+/Vpd8/h2HFMwJSdTliu7f/yr1A6vDdJfKICZsShqsYpEQbdhg8AFQ==}
     dev: false
 
   /diff/4.0.2:
@@ -1001,14 +1012,14 @@ packages:
       once: 1.4.0
     dev: false
 
-  /puppeteer/15.4.0:
-    resolution: {integrity: sha512-wxJRbofjaycCaQ9fhABlToJobrjxlABiFi6NvdkOPVJMYFblxDlDTjkg+b6bZYi7xN+lEXn84GBZsA5DYb3wfw==}
+  /puppeteer/15.5.0:
+    resolution: {integrity: sha512-+vZPU8iBSdCx1Kn5hHas80fyo0TiVyMeqLGv/1dygX2HKhAZjO9YThadbRTCoTYq0yWw+w/CysldPsEekDtjDQ==}
     engines: {node: '>=14.1.0'}
     requiresBuild: true
     dependencies:
       cross-fetch: 3.1.5
       debug: 4.3.4
-      devtools-protocol: 0.0.1011705
+      devtools-protocol: 0.0.1019158
       extract-zip: 2.0.1
       https-proxy-agent: 5.0.1
       pkg-dir: 4.2.0
@@ -1230,7 +1241,7 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: false
 
-  /ts-node/10.9.1_tdn3ypgnfy6bmey2q4hu5jonwi:
+  /ts-node/10.9.1_f6w67sjx3imwytyzb2qhabnzqe:
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -1249,8 +1260,8 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.3
-      '@types/node': 18.0.6
-      acorn: 8.7.1
+      '@types/node': 18.6.1
+      acorn: 8.8.0
       acorn-walk: 8.2.0
       arg: 4.1.3
       create-require: 1.1.1

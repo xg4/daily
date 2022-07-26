@@ -1,121 +1,44 @@
-import { Task } from '@prisma/client'
-import dayjs from 'dayjs'
 import dotenv from 'dotenv'
-import { app, prisma } from './helpers'
-import { taskHandlers } from './tasks'
-import { parseCookies } from './utils'
+import { prisma } from './helpers'
+import Application from './helpers/application'
+import { init, injectEnv, runtime } from './middleware'
+import { project } from './tasks'
 
 dotenv.config()
 
-function injectEnv(tasks: Task[]) {
-  return Promise.all(
-    tasks.map(async (task) => {
-      const keys = Object.keys(process.env).filter((k) =>
-        k.startsWith(task.envPrefix)
-      )
-      await Promise.all(
-        keys.map(async (k) => {
-          const cookie = process.env[k]
-          if (!cookie) {
-            return
-          }
-          const saved = await prisma.account.findUnique({
-            where: {
-              cookie,
-            },
-          })
-          if (saved) {
-            return
-          }
-          return prisma.account.create({
-            data: {
-              cookie,
-              taskId: task.id,
-              published: true,
-            },
-          })
-        })
-      )
-    })
-  )
-}
-
 async function main() {
-  const tasks = await prisma.task.findMany()
+  const app = new Application()
 
-  await injectEnv(tasks)
+  const tasks = project.register()
 
-  app.use(async (ctx, next) => {
-    const now = Date.now()
-    console.log(`[App] ---------> ${dayjs().format('MM-DD HH:mm')}`)
-    await next()
-    console.log(`[App] <--------- +${(Date.now() - now) / 1e3}s`)
-  })
-
-  tasks.forEach(async (t) => {
-    const handler = taskHandlers[t.name]
-    if (!handler) {
-      return
-    }
-
-    const accounts = await prisma.account.findMany({
+  for (const t of tasks) {
+    await prisma.task.upsert({
       where: {
-        published: true,
-        taskId: t.id,
+        name: t.name,
       },
-      include: {
-        task: true,
-      },
+      update: t,
+      create: t,
     })
+  }
 
-    accounts.forEach((account) => {
-      app.use(async (ctx, next) => {
-        console.log(`[${account.task.name}] ${account.id}`)
+  app.use(runtime())
+  app.use(init)
+  app.use(injectEnv)
 
-        let cookies: any
-        if (account.pptrCookie) {
-          cookies = JSON.parse(account.pptrCookie)
-        } else if (account.cookie) {
-          cookies = parseCookies(account.cookie).map((i) => ({
-            ...i,
-            domain: t.domain,
-          }))
-        }
-
-        if (cookies) {
-          const page = await ctx.browser.newPage()
-          await page.setCookie(...cookies)
-          const result = await handler(page)
-          await prisma.record.create({
-            data: {
-              accountId: account.id,
-              content: result,
-            },
-          })
-          const newCookies = await page.cookies()
-          await prisma.account.update({
-            where: {
-              id: account.id,
-            },
-            data: {
-              pptrCookie: JSON.stringify(newCookies),
-            },
-          })
-
-          await page.deleteCookie(...newCookies)
-          await page.close()
-        }
-
-        await next()
-      })
-    })
+  const accounts = await prisma.account.findMany({
+    include: {
+      task: true,
+    },
   })
 
-  app.run()
+  app.use(project.tasks(accounts))
+
+  await app.run()
 }
 
 main()
   .catch(console.log)
-  .finally(() => {
-    prisma.$disconnect()
+  .finally(async () => {
+    await prisma.$disconnect()
+    process.exit(1)
   })

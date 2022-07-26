@@ -1,36 +1,30 @@
-import compose, { Middleware } from 'koa-compose'
-import puppeteer from 'puppeteer'
-import { Ctx } from '../types'
+import compose from 'koa-compose'
+import type { Handler } from '../types'
 
 export default class Application {
-  middleware: Middleware<Ctx>[]
+  middleware: Handler[]
 
   constructor() {
     this.middleware = []
   }
 
-  use(fn: Middleware<Ctx>) {
-    this.middleware.push(fn)
+  use(middleware: Handler[]): Application
+  use(middleware: Handler): Application
+  use(middleware: Handler | Handler[]) {
+    if (Array.isArray(middleware)) {
+      for (const m of middleware) {
+        this.use.call(this, m)
+      }
+      return this
+    }
+    this.middleware.push(middleware)
     return this
   }
 
-  async run() {
-    const browser = await puppeteer.launch({
-      ignoreHTTPSErrors: true,
-      headless: false,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    })
-    this.middleware.unshift(async (ctx, next) => {
-      await next()
-      await browser.close()
-    })
-    const fn = compose(this.middleware)
-    const ctx = {
+  run() {
+    const ctx: any = {
       app: this,
-      browser,
     }
-    fn(ctx)
+    return compose(this.middleware)(ctx)
   }
 }
-
-export const app = new Application()

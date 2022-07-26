@@ -17,6 +17,7 @@ model Task {
   domain    String
 
   accounts Account[]
+  records  Record[]
 
   @@map("tasks")
 }
@@ -45,6 +46,9 @@ model Record {
 
   accountId Int     @map("account_id")
   account   Account @relation(fields: [accountId], references: [id])
+
+  taskId Int  @map("task_id")
+  task   Task @relation(fields: [taskId], references: [id])
 
   content String
 

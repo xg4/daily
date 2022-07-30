@@ -7,12 +7,11 @@ project.use(
   async (ctx, next) => {
     const { page } = ctx
     await page.goto('https://live.bilibili.com/')
-    const result = await page.evaluate(async () =>
+    ctx.body = await page.evaluate(async () =>
       fetch('https://api.live.bilibili.com/xlive/web-ucenter/v1/sign/DoSign', {
         credentials: 'include',
       }).then((r) => r.json())
     )
-    ctx.body = result
     await next()
   }
 )
@@ -34,15 +33,18 @@ project.use(
     }
     try {
       const btn = await page.waitForSelector('input[value="领取 X 铜币"]', {
-        timeout: 2 * 1e3,
+        timeout: 10,
       })
-      if (!btn) {
-        throw new Error('not found btn')
-      }
-      await Promise.all([btn.click(), page.waitForNavigation()])
-      ctx.body = '签到成功'
+      await Promise.all([btn?.click(), page.waitForNavigation()])
+      ctx.body = await page.$eval(
+        '#Main > div.box > div.message',
+        (el) => el.textContent
+      )
     } catch {
-      ctx.body = '已签到'
+      ctx.body = await page.$eval(
+        '#Main > div.box > div:nth-child(2) > span',
+        (el) => el.textContent
+      )
     }
 
     await next()
@@ -75,20 +77,18 @@ project.use(
     if (!checkInBtn || !checkInText) {
       throw new Error('not found checkInBtn or checkInText')
     }
-    if (checkInText.trim() === '已签到') {
-      ctx.body = '已签到'
+    if (checkInText.includes('已签到')) {
+      ctx.body = checkInText
     } else {
-      const [result] = await Promise.all([
-        page
-          .waitForResponse((res) => {
-            return res.url
-              .toString()
-              .startsWith('https://music.163.com/weapi/point/dailyTask')
-          })
-          .then((r) => r.json()),
-        checkInBtn.click(),
-      ])
-      ctx.body = result
+      await checkInBtn.click()
+
+      ctx.body = await page
+        .waitForResponse((res) => {
+          return res
+            .url()
+            .startsWith('https://music.163.com/weapi/point/dailyTask')
+        })
+        .then((res) => res.json())
     }
 
     await next()
@@ -105,12 +105,11 @@ project.use(
     const { page } = ctx
     await page.goto('https://www.acfun.cn/member/')
 
-    const result = await page.evaluate(async () =>
+    ctx.body = await page.evaluate(async () =>
       fetch('https://www.acfun.cn/rest/pc-direct/user/signIn').then((r) =>
         r.json()
       )
     )
-    ctx.body = result
 
     await next()
   }

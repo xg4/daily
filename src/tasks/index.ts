@@ -160,3 +160,64 @@ project.use(
     await next()
   }
 )
+
+project.use(
+  {
+    name: 'juejin',
+    envPrefix: 'JUEJIN_COOKIE',
+    domain: '.juejin.cn',
+  },
+  async (ctx, next) => {
+    const { page } = ctx
+
+    await page.goto('https://juejin.cn/user/center/signin')
+    await page.waitForSelector('.signin-content')
+    const btn = await page.waitForSelector('.code-calender .btn')
+    if (!btn) {
+      throw new Error('not found btn')
+    }
+    const text = await btn.evaluate((el) => el.textContent)
+    if (text && text.includes('已签到')) {
+      ctx.body = text
+    } else {
+      const [result] = await Promise.all([
+        page
+          .waitForResponse((res) =>
+            res.url().startsWith('https://api.juejin.cn/growth_api/v1/check_in')
+          )
+          .then((res) => res.json()),
+        btn.click(),
+      ])
+      ctx.body = result
+    }
+
+    // 沾喜气
+    // page.waitForResponse((res) =>
+    //   res
+    //     .url()
+    //     .startsWith(
+    //       'https://api.juejin.cn/growth_api/v1/lottery_lucky/dip_lucky'
+    //     )
+    // )
+
+    // const btns = await page.$$('.tooltip-box')
+
+    // 抽奖
+    // await page.goto('https://juejin.cn/user/center/lottery')
+    // const btn2 = await page.waitForSelector('#turntable-item-0')
+    // if (!btn2) {
+    //   throw new Error('not found btn2')
+    // }
+    // await Promise.all([
+    //   page
+    //     .waitForResponse((res) =>
+    //       res
+    //         .url()
+    //         .startsWith('https://api.juejin.cn/growth_api/v1/lottery/draw')
+    //     )
+    //     .then((res) => res.json()),
+    //   btn2.click(),
+    // ])
+    await next()
+  }
+)

@@ -1,27 +1,27 @@
-import dotenv from 'dotenv'
-import { prisma } from './helpers'
-import Application from './helpers/application'
-import { init, injectEnv, logger } from './middleware'
-import { project } from './tasks'
+import cors from '@koa/cors'
+import Koa from 'koa'
+import body from 'koa-body'
+import jwt from 'koa-jwt'
+import logger from 'koa-logger'
+import { get } from 'lodash'
+import { errorHandler } from './middlewares'
+import { router } from './routes'
 
-dotenv.config()
+const app = new Koa()
 
-async function main() {
-  const app = new Application()
+app
+  .use(errorHandler())
+  .use(logger())
+  .use(cors())
+  .use(body())
+  .use(
+    jwt({ key: 'jwt', secret: get(process.env, 'JWT_SECRET')! }).unless({
+      path: [/^\/auth/],
+    })
+  )
+  .use(router.routes())
+  .use(router.allowedMethods())
 
-  app.use(logger())
-  app.use(init)
-  app.use(injectEnv)
-
-  await project.register()
-  app.use(project.tasks())
-
-  await app.run()
-}
-
-main()
-  .catch(console.log)
-  .finally(async () => {
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+app.listen(3000, () => {
+  console.log('Server is running on port http://localhost:3000')
+})

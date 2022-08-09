@@ -1,19 +1,30 @@
-import type { Account, Task } from '@prisma/client'
-import type { Middleware } from 'koa-compose'
+import type { Account, Project, User } from '@prisma/client'
+import type compose from 'koa-compose'
 import type { Browser, Page } from 'puppeteer'
-import type Application from '../helpers/application'
-import type Project from '../helpers/project'
 
-export interface Ctx {
-  app: Application
-  project: Project
-
-  browser: Browser
+type Ctx = {
+  readonly browser: Browser
   page: Page
 
-  body: any
+  message: any
+  status: number
 }
 
-export type AccountWithTask = Account & { task: Task }
+export type Middleware = compose.Middleware<Ctx>
+export type ComposedMiddleware = compose.ComposedMiddleware<Ctx>
 
-export type Handler = Middleware<Ctx>
+export type AccountWithProject = Account & { project: Project }
+
+declare module 'koa' {
+  type JwtUser = Pick<User, 'id' | 'username'>
+
+  type JwtPayload = {
+    user: JwtUser
+    iat: number
+  }
+  interface BaseContext {
+    state: {
+      jwt: JwtPayload
+    }
+  }
+}

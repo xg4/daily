@@ -3,23 +3,39 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./sqlite.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-model Task {
+model User {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  name      String @unique
-  envPrefix String @unique @map("env_prefix")
-  domain    String
+  username String  @unique
+  email    String? @unique
+  password String
 
   accounts Account[]
-  records  Record[]
+  projects Project[]
 
-  @@map("tasks")
+  @@map("users")
+}
+
+model Project {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name        String  @unique
+  description String?
+  domain      String
+  author      User    @relation(fields: [authorId], references: [id])
+  authorId    Int     @map("author_id")
+
+  accounts Account[]
+
+  @@map("projects")
 }
 
 model Account {
@@ -27,11 +43,14 @@ model Account {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  cookie     String  @unique
-  pptrCookie String? @unique @map("pptr_cookie")
+  cookie       String
+  cookieHash   String  @unique @map("cookie_hash")
+  latestCookie String? @map("latest_cookie")
 
-  task   Task @relation(fields: [taskId], references: [id])
-  taskId Int  @map("task_id")
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId Int     @map("project_id")
+  author    User    @relation(fields: [authorId], references: [id])
+  authorId  Int     @map("author_id")
 
   records Record[]
 
@@ -46,10 +65,8 @@ model Record {
   accountId Int     @map("account_id")
   account   Account @relation(fields: [accountId], references: [id])
 
-  taskId Int  @map("task_id")
-  task   Task @relation(fields: [taskId], references: [id])
-
-  content String
+  message String
+  status  Int
 
   @@map("records")
 }

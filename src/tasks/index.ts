@@ -192,21 +192,27 @@ project.use(
     }
 
     // 沾喜气
-    // page.waitForResponse((res) =>
-    //   res
-    //     .url()
-    //     .startsWith(
-    //       'https://api.juejin.cn/growth_api/v1/lottery_lucky/dip_lucky'
-    //     )
-    // )
-
-    // const btns = await page.$$('.tooltip-box')
-
-    // 抽奖
-    // await page.goto('https://juejin.cn/user/center/lottery')
-    // const btn2 = await page.waitForSelector('#turntable-item-0')
+    // await page.goto('https://juejin.cn/user/center/lottery?t=' + Date.now())
+    // const btn2 = await page.waitForSelector('.tooltip-box')
     // if (!btn2) {
     //   throw new Error('not found btn2')
+    // }
+    // await Promise.all([
+    //   page.waitForResponse((res) =>
+    //     res
+    //       .url()
+    //       .startsWith(
+    //         'https://api.juejin.cn/growth_api/v1/lottery_lucky/dip_lucky'
+    //       )
+    //   ),
+    //   btn2.click(),
+    // ])
+
+    // 抽奖
+    // await page.goto('https://juejin.cn/user/center/lottery?t=' + Date.now())
+    // const btn3 = await page.waitForSelector('#turntable-item-0')
+    // if (!btn3) {
+    //   throw new Error('not found btn3')
     // }
     // await Promise.all([
     //   page
@@ -216,8 +222,9 @@ project.use(
     //         .startsWith('https://api.juejin.cn/growth_api/v1/lottery/draw')
     //     )
     //     .then((res) => res.json()),
-    //   btn2.click(),
+    //   btn3.click(),
     // ])
+
     await next()
   }
 )

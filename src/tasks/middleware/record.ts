@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import createHttpError from 'http-errors'
 import { prisma } from '../../helpers'
 import type { Middleware } from '../../types'
 
@@ -15,7 +16,7 @@ export function record(): Middleware {
     })
 
     if (record && dayjs(record.createdAt).isToday()) {
-      throw new Error('You have already logged today')
+      throw createHttpError('今日已经执行过了')
     }
 
     // reset status and message

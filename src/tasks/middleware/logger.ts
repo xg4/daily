@@ -1,7 +1,8 @@
-import type { AccountWithProject, Middleware } from '../../types'
+import type { Middleware } from '../../types'
 
-export function logger(account: AccountWithProject): Middleware {
-  return async (_, next) => {
+export function logger(): Middleware {
+  return async (ctx, next) => {
+    const { account } = ctx
     const name = account.project.name
     const id = account.id
     const now = Date.now()

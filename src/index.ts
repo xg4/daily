@@ -1,4 +1,6 @@
 import cors from '@koa/cors'
+import dayjs from 'dayjs'
+import isToday from 'dayjs/plugin/isToday'
 import Koa from 'koa'
 import body from 'koa-body'
 import jwt from 'koa-jwt'
@@ -6,6 +8,8 @@ import logger from 'koa-logger'
 import { get } from 'lodash'
 import { errorHandler } from './middlewares'
 import { router } from './routes'
+
+dayjs.extend(isToday)
 
 const app = new Koa()
 

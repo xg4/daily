@@ -1,7 +1,8 @@
 import compose from 'koa-compose'
+import { noop } from 'lodash'
 import puppeteer, { Browser } from 'puppeteer'
 import { tasks } from '../tasks'
-import { cookie, logger } from '../tasks/middleware'
+import { cookie, error, inject, logger, record } from '../tasks/middleware'
 import type { AccountWithProject, ComposedMiddleware } from '../types'
 
 export default class Executor {
@@ -37,7 +38,7 @@ export default class Executor {
       return this
     }
 
-    const handlers = [logger(account), cookie(account)]
+    const handlers = [error(), inject(account), record(), logger(), cookie()]
     handlers.push(task.handler)
     this.use(compose(handlers))
     return this
@@ -69,7 +70,7 @@ export default class Executor {
     }
 
     for (const fn of fns) {
-      await fn(ctx)
+      await fn(ctx).catch(noop)
     }
 
     this.running = false

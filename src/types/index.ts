@@ -4,7 +4,9 @@ import type { Browser, Page } from 'puppeteer'
 
 type Ctx = {
   readonly browser: Browser
+
   page: Page
+  account: AccountWithProject
 
   message: any
   status: number

@@ -1,2 +1,5 @@
 export * from './cookie'
+export * from './error'
+export * from './inject'
 export * from './logger'
+export * from './record'

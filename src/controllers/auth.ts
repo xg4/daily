@@ -22,8 +22,9 @@ export const login: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('Invalid username or password')
   }
 
+  const accessToken = await jwtSign(user)
   ctx.body = {
-    accessToken: jwtSign(user),
+    accessToken,
   }
 }
 
@@ -44,8 +45,10 @@ export const signup: Middleware = async (ctx) => {
       password: hashedPassword,
     },
   })
+
+  const accessToken = await jwtSign(user)
   ctx.status = 201
   ctx.body = {
-    accessToken: jwtSign(user),
+    accessToken,
   }
 }

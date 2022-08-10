@@ -20,7 +20,7 @@ app
   .use(body())
   .use(
     jwt({ key: 'jwt', secret: get(process.env, 'JWT_SECRET')! }).unless({
-      path: [/^\/auth/],
+      path: [/^(?!\/api)/, /^\/api\/auth/],
     })
   )
   .use(router.routes())
@@ -29,5 +29,5 @@ app
 const port = process.env['PORT'] || 3000
 
 app.listen(port, () => {
-  console.log(`🚀 Server is running on http://localhost:${port}`)
+  console.log(`\n\n 🚀 Server is running on http://localhost:${port} \n\n`)
 })

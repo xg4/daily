@@ -4,9 +4,7 @@ import { authRouter } from './auth'
 import { projectRouter } from './project'
 import { userRouter } from './user'
 
-export const router = new Router({
-  prefix: '/api',
-})
+export const router = new Router()
 
 router
   .use(projectRouter.routes())

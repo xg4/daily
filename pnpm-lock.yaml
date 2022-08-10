@@ -13,6 +13,7 @@ specifiers:
   '@types/koa': 2.13.5
   '@types/koa-compose': 3.2.5
   '@types/koa-logger': 3.1.2
+  '@types/koa-mount': 4.0.1
   '@types/koa__cors': 3.3.0
   '@types/koa__router': 8.0.11
   '@types/lodash': 4.14.182
@@ -30,6 +31,7 @@ specifiers:
   koa-compose: 4.1.0
   koa-jwt: 4.0.3
   koa-logger: 3.2.1
+  koa-mount: 4.0.0
   lint-staged: ^13.0.3
   lodash: 4.17.21
   nodemon: ^2.0.19
@@ -55,6 +57,7 @@ dependencies:
   koa-compose: 4.1.0
   koa-jwt: 4.0.3
   koa-logger: 3.2.1
+  koa-mount: 4.0.0
   lodash: 4.17.21
   puppeteer: 16.1.0
 
@@ -68,6 +71,7 @@ devDependencies:
   '@types/koa': 2.13.5
   '@types/koa-compose': 3.2.5
   '@types/koa-logger': 3.1.2
+  '@types/koa-mount': 4.0.1
   '@types/koa__cors': 3.3.0
   '@types/koa__router': 8.0.11
   '@types/lodash': 4.14.182
@@ -257,6 +261,12 @@ packages:
 
   /@types/koa-logger/3.1.2:
     resolution: {integrity: sha512-sioTA1xlKYiIgryANWPRHBkG3XGbWftw9slWADUPC+qvPIY/yRLSrhvX7zkJwMrntub5dPO0GuAoyGGf0yitfQ==}
+    dependencies:
+      '@types/koa': 2.13.5
+    dev: true
+
+  /@types/koa-mount/4.0.1:
+    resolution: {integrity: sha512-HNeg80CVS9Dfq8dGYqCZZCAUm7g6jPCNJ1ydqVLEJxLrjmeburpvq+lOZkE4rxBZ6O38dr3tj9IA3IfbdoI05w==}
     dependencies:
       '@types/koa': 2.13.5
     dev: true
@@ -1118,6 +1128,16 @@ packages:
       chalk: 2.4.2
       humanize-number: 0.0.2
       passthrough-counter: 1.0.0
+    dev: false
+
+  /koa-mount/4.0.0:
+    resolution: {integrity: sha512-rm71jaA/P+6HeCpoRhmCv8KVBIi0tfGuO/dMKicbQnQW/YJntJ6MnnspkodoA4QstMVEZArsCphmd0bJEtoMjQ==}
+    engines: {node: '>= 7.6.0'}
+    dependencies:
+      debug: 4.3.4
+      koa-compose: 4.1.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /koa-unless/1.0.7:

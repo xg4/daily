@@ -4,8 +4,8 @@ import body from 'koa-body'
 import jwt from 'koa-jwt'
 import logger from 'koa-logger'
 import { get } from 'lodash'
-import { errorHandler } from './middlewares'
-import { router } from './routes'
+import { errorHandler } from '../middlewares'
+import { router } from '../routes'
 
 export const app = new Koa()
 

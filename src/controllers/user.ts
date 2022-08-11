@@ -1,4 +1,6 @@
 import type { Middleware } from '@koa/router'
+import createHttpError from 'http-errors'
+import { isNumber, pick } from 'lodash'
 import { exec, prisma } from '../helpers'
 
 export const check: Middleware = async (ctx) => {
@@ -28,5 +30,22 @@ export const profile: Middleware = async (ctx) => {
     },
   })
 
-  ctx.body = user
+  ctx.body = pick(user, ['id', 'username', 'email'])
+}
+
+export const getUser: Middleware = async (ctx) => {
+  const id = +ctx.params['id']!
+  if (!isNumber(id)) {
+    throw new createHttpError.BadRequest('id必须是数字')
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+  })
+  if (!user) {
+    throw new createHttpError.NotFound('用户不存在')
+  }
+  ctx.body = pick(user, ['id', 'username', 'email'])
 }

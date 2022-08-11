@@ -9,4 +9,6 @@ router.get('/', projectController.getAll)
 
 router.post('/', projectController.create)
 
+router.get('/:id', projectController.getProject)
+
 export { router as projectRouter }

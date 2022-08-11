@@ -1,6 +1,7 @@
 import type { Middleware } from '@koa/router'
 import { SHA256 } from 'crypto-js'
 import createHttpError from 'http-errors'
+import { isNumber, omit } from 'lodash'
 import { prisma } from '../helpers'
 
 export const create: Middleware = async (ctx) => {
@@ -53,4 +54,50 @@ export const getAll: Middleware = async (ctx) => {
     },
   })
   ctx.body = accounts
+}
+
+export const getAccount: Middleware = async (ctx) => {
+  const id = +ctx.params['id']!
+  if (!isNumber(id)) {
+    throw new createHttpError.BadRequest('id必须是数字')
+  }
+
+  const currentUser = ctx.state.jwt.user
+  const account = await prisma.account.findFirst({
+    where: {
+      id,
+      authorId: currentUser.id,
+    },
+  })
+  if (!account) {
+    throw new createHttpError.NotFound('账号不存在')
+  }
+
+  ctx.body = omit(account, ['cookie', 'latestCookie'])
+}
+
+export const deleteAccount: Middleware = async (ctx) => {
+  const id = +ctx.params['id']!
+  if (!isNumber(id)) {
+    throw new createHttpError.BadRequest('id必须是数字')
+  }
+
+  const currentUser = ctx.state.jwt.user
+  const account = await prisma.account.findFirst({
+    where: {
+      id,
+      authorId: currentUser.id,
+    },
+  })
+  if (!account) {
+    throw new createHttpError.NotFound('账号不存在')
+  }
+
+  await prisma.account.delete({
+    where: {
+      id,
+    },
+  })
+
+  ctx.status = 204
 }

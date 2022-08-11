@@ -9,4 +9,6 @@ router.get('/profile', userController.profile)
 
 router.get('/daily', userController.check)
 
+router.get('/:id', userController.getUser)
+
 export { router as userRouter }

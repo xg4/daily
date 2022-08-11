@@ -1,8 +1,11 @@
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
+import dotenv from 'dotenv'
 import Koa from 'koa'
 import mount from 'koa-mount'
 import { api } from './modules'
+
+dotenv.config()
 
 dayjs.extend(isToday)
 

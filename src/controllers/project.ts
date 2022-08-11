@@ -1,5 +1,6 @@
 import type { Middleware } from '@koa/router'
 import createHttpError from 'http-errors'
+import { isNumber } from 'lodash'
 import { prisma } from '../helpers'
 
 export const getAll: Middleware = async (ctx) => {
@@ -27,4 +28,46 @@ export const create: Middleware = async (ctx) => {
   })
   ctx.status = 201
   ctx.body = project
+}
+
+export const getProject: Middleware = async (ctx) => {
+  const id = +ctx.params['id']!
+  if (!isNumber(id)) {
+    throw new createHttpError.BadRequest('id必须是数字')
+  }
+
+  const project = await prisma.project.findUnique({
+    where: {
+      id,
+    },
+  })
+  if (!project) {
+    throw new createHttpError.NotFound('项目不存在')
+  }
+  ctx.body = project
+}
+
+export const deleteProject: Middleware = async (ctx) => {
+  const id = +ctx.params['id']!
+  if (!isNumber(id)) {
+    throw new createHttpError.BadRequest('id必须是数字')
+  }
+
+  const currentUser = ctx.state.jwt.user
+
+  const project = await prisma.project.findFirst({
+    where: {
+      id,
+      authorId: currentUser.id,
+    },
+  })
+  if (!project) {
+    throw new createHttpError.NotFound('项目不存在')
+  }
+  await prisma.project.delete({
+    where: {
+      id,
+    },
+  })
+  ctx.status = 204
 }

@@ -6,9 +6,12 @@ import { hashPassword, isValidPassword, jwtSign } from '../utils'
 export const login: Middleware = async (ctx) => {
   const { username, password } = ctx.request.body
 
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: {
-      username,
+      username: {
+        equals: username,
+        mode: 'insensitive',
+      },
     },
   })
 
@@ -30,9 +33,12 @@ export const login: Middleware = async (ctx) => {
 
 export const signup: Middleware = async (ctx) => {
   const { username, password } = ctx.request.body
-  const savedUser = await prisma.user.findUnique({
+  const savedUser = await prisma.user.findFirst({
     where: {
-      username,
+      username: {
+        equals: username,
+        mode: 'insensitive',
+      },
     },
   })
   if (savedUser) {

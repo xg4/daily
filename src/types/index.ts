@@ -1,6 +1,10 @@
-import type { Account, Project, User } from '@prisma/client'
+import type { Account, Prisma, Project, User } from '@prisma/client'
 import type compose from 'koa-compose'
 import type { Browser, Page } from 'puppeteer'
+
+export interface Task extends Prisma.ProjectCreateInput {
+  handler: Middleware
+}
 
 type Ctx = {
   readonly browser: Browser

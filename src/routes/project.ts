@@ -5,9 +5,7 @@ const router = new Router({
   prefix: '/project',
 })
 
-router.get('/', projectController.getAll)
-
-router.post('/', projectController.create)
+router.get('/', projectController.getProjects)
 
 router.get('/:id', projectController.getProject)
 

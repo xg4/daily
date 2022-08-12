@@ -17,7 +17,6 @@ model User {
   password String
 
   accounts Account[]
-  projects Project[]
 
   @@map("users")
 }
@@ -30,8 +29,6 @@ model Project {
   name        String  @unique
   description String?
   domain      String
-  author      User    @relation(fields: [authorId], references: [id])
-  authorId    Int     @map("author_id")
 
   accounts Account[]
 

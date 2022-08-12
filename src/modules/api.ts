@@ -3,9 +3,28 @@ import Koa from 'koa'
 import body from 'koa-body'
 import jwt from 'koa-jwt'
 import logger from 'koa-logger'
-import { get } from 'lodash'
+import { get, pick } from 'lodash'
+import { prisma } from '../helpers'
 import { errorHandler } from '../middlewares'
 import { router } from '../routes'
+import { tasks } from '../tasks'
+
+async function initDB() {
+  await Promise.all(
+    tasks.map(async (t) => {
+      const project = pick(t, ['name', 'description', 'domain'])
+      await prisma.project.upsert({
+        where: {
+          name: project.name,
+        },
+        create: project,
+        update: project,
+      })
+    })
+  )
+}
+
+initDB()
 
 export const app = new Koa()
 

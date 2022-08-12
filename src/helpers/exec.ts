@@ -1,7 +1,7 @@
 import compose from 'koa-compose'
-import { get, noop } from 'lodash'
+import { noop } from 'lodash'
 import puppeteer, { Browser } from 'puppeteer'
-import * as tasks from '../tasks'
+import { tasks } from '../tasks'
 import { cookie, error, inject, logger, record } from '../tasks/middleware'
 import type { AccountWithProject, ComposedMiddleware } from '../types'
 
@@ -33,13 +33,13 @@ export default class Executor {
       return this
     }
 
-    const handler = get(tasks, account.project.name)
-    if (!handler) {
+    const task = tasks.find((t) => t.name === account.project.name)
+    if (!task) {
       return this
     }
 
     const handlers = [error(), inject(account), record(), logger(), cookie()]
-    handlers.push(handler)
+    handlers.push(task.handler)
     this.use(compose(handlers))
     return this
   }

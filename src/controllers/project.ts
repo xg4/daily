@@ -33,7 +33,7 @@ export const create: Middleware = async (ctx) => {
 export const getProject: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('id必须是数字')
+    throw new createHttpError.BadRequest('请输入项目 id')
   }
 
   const project = await prisma.project.findUnique({
@@ -50,7 +50,7 @@ export const getProject: Middleware = async (ctx) => {
 export const deleteProject: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('id必须是数字')
+    throw new createHttpError.BadRequest('请输入项目 id')
   }
 
   const currentUser = ctx.state.jwt.user

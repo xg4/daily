@@ -59,7 +59,7 @@ export const getAll: Middleware = async (ctx) => {
 export const getAccount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('id必须是数字')
+    throw new createHttpError.BadRequest('请输入账号 id')
   }
 
   const currentUser = ctx.state.jwt.user
@@ -79,7 +79,7 @@ export const getAccount: Middleware = async (ctx) => {
 export const deleteAccount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('id必须是数字')
+    throw new createHttpError.BadRequest('请输入账号 id')
   }
 
   const currentUser = ctx.state.jwt.user
@@ -100,4 +100,35 @@ export const deleteAccount: Middleware = async (ctx) => {
   })
 
   ctx.status = 204
+}
+
+export const getRecords: Middleware = async (ctx) => {
+  const id = +ctx.params['id']!
+  if (!isNumber(id)) {
+    throw new createHttpError.BadRequest('请输入账号 id')
+  }
+
+  const currentUser = ctx.state.jwt.user
+
+  const account = await prisma.account.findUnique({
+    where: {
+      id,
+    },
+  })
+
+  if (account?.authorId !== currentUser.id) {
+    throw new createHttpError.Forbidden('无权限')
+  }
+
+  const records = await prisma.record.findMany({
+    where: {
+      accountId: id,
+      status: 1,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
+  ctx.body = records
 }

@@ -36,7 +36,7 @@ export const profile: Middleware = async (ctx) => {
 export const getUser: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('id必须是数字')
+    throw new createHttpError.BadRequest('请输入用户 id')
   }
 
   const user = await prisma.user.findUnique({

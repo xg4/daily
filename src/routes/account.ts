@@ -13,4 +13,6 @@ router.get('/:id', accountController.getAccount)
 
 router.delete('/:id', accountController.deleteAccount)
 
+router.get('/:id/records', accountController.getRecords)
+
 export { router as accountRouter }

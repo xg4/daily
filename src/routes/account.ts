@@ -15,6 +15,8 @@ router.delete('/:id', accountController.deleteAccount)
 
 router.get('/:id/daily', accountController.getDailyStatus)
 
-router.post('/:id/daily', accountController.checkIn)
+router.post('/:id/daily', accountController.checkInById)
+
+router.post('/daily', accountController.checkIn)
 
 export { router as accountRouter }

@@ -7,8 +7,6 @@ const router = new Router({
 
 router.get('/profile', userController.profile)
 
-router.get('/daily', userController.checkIn)
-
 router.get('/:id', userController.getUser)
 
 export { router as userRouter }

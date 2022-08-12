@@ -1,26 +1,16 @@
 import type { Middleware } from '@koa/router'
+import type { Account } from '@prisma/client'
 import { SHA256 } from 'crypto-js'
 import dayjs from 'dayjs'
 import createHttpError from 'http-errors'
-import { isNumber, omit } from 'lodash'
+import { isNumber, isString, omit } from 'lodash'
 import { exec, prisma } from '../helpers'
 
 export const create: Middleware = async (ctx) => {
-  let { cookie, projectId } = ctx.request.body
+  const { cookie } = ctx.request.body
 
-  if (!cookie || !projectId) {
-    throw new createHttpError.BadRequest('cookie或projectId不能为空')
-  }
-
-  projectId = +projectId
-
-  const project = await prisma.project.findUnique({
-    where: {
-      id: projectId,
-    },
-  })
-  if (!project) {
-    throw new createHttpError.BadRequest('项目不存在')
+  if (!cookie) {
+    throw new createHttpError.BadRequest('cookie 不能为空')
   }
 
   const cookieHash = SHA256(cookie).toString()
@@ -30,7 +20,7 @@ export const create: Middleware = async (ctx) => {
     },
   })
   if (savedCookie) {
-    throw new createHttpError.BadRequest('cookie已存在')
+    throw new createHttpError.BadRequest('账号已存在')
   }
 
   const currentUser = ctx.state.jwt.user
@@ -38,10 +28,32 @@ export const create: Middleware = async (ctx) => {
     data: {
       cookie,
       cookieHash,
-      projectId,
       authorId: currentUser.id,
     },
   })
+
+  const { projectIds } = ctx.request.body
+  if (isString(projectIds)) {
+    for (const id of projectIds.split(',')) {
+      const projectId = +id
+      const project = await prisma.project.findUnique({
+        where: {
+          id: projectId,
+        },
+      })
+      if (!project) {
+        continue
+      }
+
+      await prisma.projectsOnAccounts.create({
+        data: {
+          projectId,
+          accountId: account.id,
+        },
+      })
+    }
+  }
+
   ctx.status = 201
   ctx.body = account
 }
@@ -144,7 +156,7 @@ export const getDailyStatus: Middleware = async (ctx) => {
   ctx.body = dayjs(record.createdAt).isToday()
 }
 
-export const checkIn: Middleware = async (ctx) => {
+export const checkInById: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
     throw new createHttpError.BadRequest('请输入账号 id')
@@ -156,17 +168,51 @@ export const checkIn: Middleware = async (ctx) => {
     where: {
       id,
     },
-    include: {
-      project: true,
-    },
   })
 
   if (account?.authorId !== currentUser.id) {
     throw new createHttpError.Forbidden('无权限')
   }
 
-  exec.register(account).run()
+  await register(account)
 
   ctx.status = 201
   ctx.body = '加入签到队列成功'
+}
+
+export const checkIn: Middleware = async (ctx) => {
+  const currentUser = ctx.state.jwt.user
+
+  const accounts = await prisma.account.findMany({
+    where: {
+      authorId: currentUser.id,
+    },
+  })
+
+  await register(accounts)
+
+  ctx.status = 201
+  ctx.body = '加入签到队列成功'
+}
+
+function register(account: Account[]): Promise<void>
+function register(account: Account): Promise<void>
+async function register(account: Account | Account[]): Promise<void> {
+  if (Array.isArray(account)) {
+    for (const item of account) {
+      await register(item)
+    }
+    return
+  }
+
+  const list = await prisma.projectsOnAccounts.findMany({
+    where: {
+      accountId: account.id,
+    },
+    include: {
+      project: true,
+    },
+  })
+
+  exec.register(list.map((item) => ({ account, project: item.project })))
 }

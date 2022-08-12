@@ -3,7 +3,7 @@ import type { Middleware } from '../../types'
 export function logger(): Middleware {
   return async (ctx, next) => {
     const { account } = ctx
-    const name = account.project.name
+    const name = ctx.project.name
     const id = account.id
     const now = Date.now()
     console.log(`\t <-- ${name} ${id}`)

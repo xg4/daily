@@ -12,7 +12,7 @@ export function cookie(): Middleware {
     } else if (account.cookie) {
       cookies = parseCookies(account.cookie).map((i) => ({
         ...i,
-        domain: account.project.domain,
+        domain: ctx.project.domain,
       }))
     }
 

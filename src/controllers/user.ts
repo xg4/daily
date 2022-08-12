@@ -1,25 +1,7 @@
 import type { Middleware } from '@koa/router'
 import createHttpError from 'http-errors'
 import { isNumber, pick } from 'lodash'
-import { exec, prisma } from '../helpers'
-
-export const checkIn: Middleware = async (ctx) => {
-  const currentUser = ctx.state.jwt.user
-
-  const accounts = await prisma.account.findMany({
-    where: {
-      authorId: currentUser.id,
-    },
-    include: {
-      project: true,
-    },
-  })
-
-  exec.register(accounts).run()
-
-  ctx.status = 201
-  ctx.body = '加入签到队列成功'
-}
+import { prisma } from '../helpers'
 
 export const profile: Middleware = async (ctx) => {
   const currentUser = ctx.state.jwt.user

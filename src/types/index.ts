@@ -10,16 +10,15 @@ type Ctx = {
   readonly browser: Browser
 
   page: Page
-  account: AccountWithProject
 
   message: any
   status: number
-}
+} & AccountWithProject
 
 export type Middleware = compose.Middleware<Ctx>
 export type ComposedMiddleware = compose.ComposedMiddleware<Ctx>
 
-export type AccountWithProject = Account & { project: Project }
+export type AccountWithProject = { account: Account } & { project: Project }
 
 declare module 'koa' {
   type JwtUser = Pick<User, 'id' | 'username'>

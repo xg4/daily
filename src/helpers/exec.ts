@@ -12,7 +12,7 @@ export default class Executor {
     if (!this.browser) {
       this.browser = await puppeteer.launch({
         ignoreHTTPSErrors: true,
-        headless: true,
+        headless: false,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
       })
     }
@@ -23,24 +23,25 @@ export default class Executor {
   private queue: ComposedMiddleware[] = []
   private running = false
 
-  register(account: AccountWithProject[]): Executor
-  register(account: AccountWithProject): Executor
-  register(account: AccountWithProject | AccountWithProject[]): Executor {
-    if (Array.isArray(account)) {
-      for (const item of account) {
+  register(state: AccountWithProject[]): Executor
+  register(state: AccountWithProject): Executor
+  register(state: AccountWithProject | AccountWithProject[]): Executor {
+    if (Array.isArray(state)) {
+      for (const item of state) {
         this.register.call(this, item)
       }
       return this
     }
 
-    const task = tasks.find((t) => t.name === account.project.name)
+    const task = tasks.find((t) => t.name === state.project.name)
     if (!task) {
       return this
     }
 
-    const handlers = [error(), inject(account), record(), logger(), cookie()]
+    const handlers = [error(), inject(state), record(), logger(), cookie()]
     handlers.push(task.handler)
     this.use(compose(handlers))
+    this.run()
     return this
   }
 

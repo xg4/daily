@@ -1,5 +1,53 @@
 import type { Middleware } from '../types'
 
+export const juejinLucky: Middleware = async (ctx, next) => {
+  const { page } = ctx
+
+  await page.goto('https://juejin.cn/user/center/lottery')
+  const btn2 = await page.waitForSelector('.tooltip-box')
+  if (!btn2) {
+    throw new Error('not found btn2')
+  }
+  const [result] = await Promise.all([
+    page
+      .waitForResponse((res) =>
+        res
+          .url()
+          .startsWith(
+            'https://api.juejin.cn/growth_api/v1/lottery_lucky/dip_lucky'
+          )
+      )
+      .then((res) => res.json()),
+    btn2.click(),
+  ])
+
+  ctx.status = 1
+  ctx.message = result
+
+  await next()
+}
+
+export const juejinLottery: Middleware = async (ctx, next) => {
+  const { page } = ctx
+  await page.goto('https://juejin.cn/user/center/lottery?t=' + Date.now())
+  const btn3 = await page.waitForSelector('#turntable-item-0')
+  if (!btn3) {
+    throw new Error('not found btn3')
+  }
+  const [result] = await Promise.all([
+    page
+      .waitForResponse((res) =>
+        res.url().startsWith('https://api.juejin.cn/growth_api/v1/lottery/draw')
+      )
+      .then((res) => res.json()),
+    btn3.click(),
+  ])
+
+  ctx.status = 1
+  ctx.message = result
+  await next()
+}
+
 export const juejin: Middleware = async (ctx, next) => {
   const { page } = ctx
 
@@ -25,40 +73,6 @@ export const juejin: Middleware = async (ctx, next) => {
     ctx.message = result
     ctx.status = 1
   }
-
-  // 沾喜气
-  // await page.goto('https://juejin.cn/user/center/lottery?t=' + Date.now())
-  // const btn2 = await page.waitForSelector('.tooltip-box')
-  // if (!btn2) {
-  //   throw new Error('not found btn2')
-  // }
-  // await Promise.all([
-  //   page.waitForResponse((res) =>
-  //     res
-  //       .url()
-  //       .startsWith(
-  //         'https://api.juejin.cn/growth_api/v1/lottery_lucky/dip_lucky'
-  //       )
-  //   ),
-  //   btn2.click(),
-  // ])
-
-  // 抽奖
-  // await page.goto('https://juejin.cn/user/center/lottery?t=' + Date.now())
-  // const btn3 = await page.waitForSelector('#turntable-item-0')
-  // if (!btn3) {
-  //   throw new Error('not found btn3')
-  // }
-  // await Promise.all([
-  //   page
-  //     .waitForResponse((res) =>
-  //       res
-  //         .url()
-  //         .startsWith('https://api.juejin.cn/growth_api/v1/lottery/draw')
-  //     )
-  //     .then((res) => res.json()),
-  //   btn3.click(),
-  // ])
 
   await next()
 }

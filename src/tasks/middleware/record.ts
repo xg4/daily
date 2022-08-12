@@ -53,6 +53,7 @@ export function record(): Middleware {
 
     await prisma.record.create({
       data: {
+        projectId: ctx.project.id,
         accountId: ctx.account.id,
         message,
         status: ctx.status,

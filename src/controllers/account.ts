@@ -9,7 +9,7 @@ import { exec, prisma } from '../helpers'
 const ACCOUNT_OMIT = ['cookie', 'latestCookie']
 
 export const create: Middleware = async (ctx) => {
-  const { cookie, projectIds } = ctx.request.body
+  const { cookie, projectIds, name, description } = ctx.request.body
 
   if (!cookie) {
     throw new createHttpError.BadRequest('cookie 不能为空')
@@ -28,6 +28,8 @@ export const create: Middleware = async (ctx) => {
   const currentUser = ctx.state.jwt.user
   const account = await prisma.account.create({
     data: {
+      name,
+      description,
       cookie,
       cookieHash,
       authorId: currentUser.id,

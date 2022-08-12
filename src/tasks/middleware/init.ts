@@ -16,6 +16,7 @@ export function init(state: AccountWithProject): Middleware {
         // save unknown error message
         await prisma.record.create({
           data: {
+            projectId: ctx.project.id,
             accountId: ctx.account.id,
             message: err.message,
             status: 0,

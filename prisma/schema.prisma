@@ -31,6 +31,7 @@ model Project {
   domain      String
 
   accounts ProjectsOnAccounts[]
+  records  Record[]
 
   @@index([domain])
   @@map("projects")
@@ -51,6 +52,8 @@ model Account {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  name         String?
+  description  String?
   cookie       String
   cookieHash   String  @unique @map("cookie_hash")
   latestCookie String? @map("latest_cookie")
@@ -70,11 +73,13 @@ model Record {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  accountId Int     @map("account_id")
-  account   Account @relation(fields: [accountId], references: [id])
-
   message String
   status  Int
+
+  accountId Int     @map("account_id")
+  account   Account @relation(fields: [accountId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId Int     @map("project_id")
 
   @@index([accountId])
   @@map("records")

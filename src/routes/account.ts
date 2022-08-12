@@ -9,7 +9,7 @@ router.get('/', accountController.getAll)
 
 router.post('/', accountController.create)
 
-router.get('/:id', accountController.getAccount)
+router.get('/:id', accountController.getOne)
 
 router.delete('/:id', accountController.deleteAccount)
 

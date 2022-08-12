@@ -3,11 +3,13 @@ import type { Account } from '@prisma/client'
 import { SHA256 } from 'crypto-js'
 import dayjs from 'dayjs'
 import createHttpError from 'http-errors'
-import { isNumber, isString, omit } from 'lodash'
+import { isArray, isNumber, omit } from 'lodash'
 import { exec, prisma } from '../helpers'
 
+const ACCOUNT_OMIT = ['cookie', 'latestCookie']
+
 export const create: Middleware = async (ctx) => {
-  const { cookie } = ctx.request.body
+  const { cookie, projectIds } = ctx.request.body
 
   if (!cookie) {
     throw new createHttpError.BadRequest('cookie 不能为空')
@@ -29,33 +31,25 @@ export const create: Middleware = async (ctx) => {
       cookie,
       cookieHash,
       authorId: currentUser.id,
+      projects: {
+        create: isArray(projectIds)
+          ? projectIds.map((projectId) => ({
+              projectId,
+            }))
+          : [],
+      },
+    },
+    include: {
+      projects: {
+        include: {
+          project: true,
+        },
+      },
     },
   })
 
-  const { projectIds } = ctx.request.body
-  if (isString(projectIds)) {
-    for (const id of projectIds.split(',')) {
-      const projectId = +id
-      const project = await prisma.project.findUnique({
-        where: {
-          id: projectId,
-        },
-      })
-      if (!project) {
-        continue
-      }
-
-      await prisma.projectsOnAccounts.create({
-        data: {
-          projectId,
-          accountId: account.id,
-        },
-      })
-    }
-  }
-
   ctx.status = 201
-  ctx.body = account
+  ctx.body = omit(account, ACCOUNT_OMIT)
 }
 
 export const getAll: Middleware = async (ctx) => {
@@ -65,28 +59,42 @@ export const getAll: Middleware = async (ctx) => {
     where: {
       authorId: currentUser.id,
     },
+    include: {
+      projects: {
+        include: {
+          project: true,
+        },
+      },
+    },
   })
-  ctx.body = accounts
+
+  ctx.body = accounts.map((account) => omit(account, ACCOUNT_OMIT))
 }
 
-export const getAccount: Middleware = async (ctx) => {
+export const getOne: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
     throw new createHttpError.BadRequest('请输入账号 id')
   }
 
   const currentUser = ctx.state.jwt.user
-  const account = await prisma.account.findFirst({
+  const account = await prisma.account.findUnique({
     where: {
       id,
-      authorId: currentUser.id,
+    },
+    include: {
+      projects: {
+        include: {
+          project: true,
+        },
+      },
     },
   })
-  if (!account) {
-    throw new createHttpError.NotFound('账号不存在')
+  if (account?.authorId !== currentUser.id) {
+    throw new createHttpError.Forbidden('无权限')
   }
 
-  ctx.body = omit(account, ['cookie', 'latestCookie'])
+  ctx.body = omit(account, ACCOUNT_OMIT)
 }
 
 export const deleteAccount: Middleware = async (ctx) => {
@@ -102,10 +110,15 @@ export const deleteAccount: Middleware = async (ctx) => {
     },
   })
   if (account?.authorId !== currentUser.id) {
-    throw new createHttpError.Forbidden('没有权限')
+    throw new createHttpError.Forbidden('无权限')
   }
 
-  await Promise.all([
+  await prisma.$transaction([
+    prisma.projectsOnAccounts.deleteMany({
+      where: {
+        accountId: id,
+      },
+    }),
     prisma.record.deleteMany({
       where: {
         accountId: id,

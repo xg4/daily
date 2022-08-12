@@ -23,3 +23,17 @@ export const getProject: Middleware = async (ctx) => {
   }
   ctx.body = project
 }
+
+export const getCount: Middleware = async (ctx) => {
+  const id = +ctx.params['id']!
+  if (!isNumber(id)) {
+    throw new createHttpError.BadRequest('请输入项目 id')
+  }
+
+  const list = await prisma.projectsOnAccounts.count({
+    where: {
+      projectId: id,
+    },
+  })
+  ctx.body = list
+}

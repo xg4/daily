@@ -9,4 +9,6 @@ router.get('/', projectController.getProjects)
 
 router.get('/:id', projectController.getProject)
 
+router.get('/:id/count', projectController.getCount)
+
 export { router as projectRouter }

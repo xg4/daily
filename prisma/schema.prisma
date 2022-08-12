@@ -35,6 +35,7 @@ model Project {
 
   accounts Account[]
 
+  @@index([domain])
   @@map("projects")
 }
 
@@ -54,6 +55,7 @@ model Account {
 
   records Record[]
 
+  @@index([authorId])
   @@map("accounts")
 }
 
@@ -68,5 +70,6 @@ model Record {
   message String
   status  Int
 
+  @@index([accountId])
   @@map("records")
 }

@@ -4,7 +4,9 @@ import { parseCookies } from '../../utils'
 
 export function cookie(): Middleware {
   return async (ctx, next) => {
-    const { page, account } = ctx
+    const page = await ctx.browser.newPage()
+    ctx.page = page
+    const { account } = ctx
 
     let cookies: any
     if (account.latestCookie) {
@@ -34,5 +36,6 @@ export function cookie(): Middleware {
       },
     })
     await page.deleteCookie(...latestCookie)
+    await page.close()
   }
 }

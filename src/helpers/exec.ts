@@ -12,7 +12,7 @@ export default class Executor {
     if (!this.browser) {
       this.browser = await puppeteer.launch({
         ignoreHTTPSErrors: true,
-        headless: false,
+        headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
       })
     }

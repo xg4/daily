@@ -7,6 +7,7 @@ export function error(): Middleware {
     next().catch(async (err) => {
       const { account } = ctx
       if (!createHttpError.isHttpError(err)) {
+        // save unknown error message
         await prisma.record.create({
           data: {
             accountId: account.id,

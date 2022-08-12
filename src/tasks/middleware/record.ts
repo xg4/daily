@@ -19,6 +19,25 @@ export function record(): Middleware {
       throw createHttpError('今日已经执行过了')
     }
 
+    // limit the number of times per day
+    const records = await prisma.record.findMany({
+      where: {
+        accountId: ctx.account.id,
+        status: 0,
+        createdAt: {
+          gte: dayjs().startOf('day').toDate(),
+          lte: dayjs().endOf('day').toDate(),
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    if (records.length >= 5) {
+      throw createHttpError('今日执行失败次数过多')
+    }
+
     // reset status and message
     ctx.message = ''
     ctx.status = 0

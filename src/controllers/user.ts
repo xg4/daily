@@ -3,7 +3,7 @@ import createHttpError from 'http-errors'
 import { isNumber, pick } from 'lodash'
 import { exec, prisma } from '../helpers'
 
-export const check: Middleware = async (ctx) => {
+export const checkIn: Middleware = async (ctx) => {
   const currentUser = ctx.state.jwt.user
 
   const accounts = await prisma.account.findMany({
@@ -18,7 +18,6 @@ export const check: Middleware = async (ctx) => {
   exec.register(accounts).run()
 
   ctx.status = 201
-  ctx.body = 'success'
 }
 
 export const profile: Middleware = async (ctx) => {

@@ -15,4 +15,6 @@ router.delete('/:id', accountController.deleteAccount)
 
 router.get('/:id/records', accountController.getRecords)
 
+router.post('/:id/daily', accountController.checkIn)
+
 export { router as accountRouter }

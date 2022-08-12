@@ -2,7 +2,7 @@ import type { Middleware } from '@koa/router'
 import { SHA256 } from 'crypto-js'
 import createHttpError from 'http-errors'
 import { isNumber, omit } from 'lodash'
-import { prisma } from '../helpers'
+import { exec, prisma } from '../helpers'
 
 export const create: Middleware = async (ctx) => {
   let { cookie, projectId } = ctx.request.body
@@ -131,4 +131,30 @@ export const getRecords: Middleware = async (ctx) => {
   })
 
   ctx.body = records
+}
+
+export const checkIn: Middleware = async (ctx) => {
+  const id = +ctx.params['id']!
+  if (!isNumber(id)) {
+    throw new createHttpError.BadRequest('请输入账号 id')
+  }
+
+  const currentUser = ctx.state.jwt.user
+
+  const account = await prisma.account.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      project: true,
+    },
+  })
+
+  if (account?.authorId !== currentUser.id) {
+    throw new createHttpError.Forbidden('无权限')
+  }
+
+  exec.register(account).run()
+
+  ctx.status = 201
 }

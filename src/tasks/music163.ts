@@ -1,6 +1,6 @@
 import type { Middleware } from '../types'
 
-export const music163: Middleware = async (ctx, next) => {
+export const music163: Middleware = async (ctx) => {
   const { page } = ctx
   await page.goto('https://music.163.com/')
 
@@ -38,6 +38,4 @@ export const music163: Middleware = async (ctx, next) => {
     ctx.message = result
     ctx.status = 1
   }
-
-  await next()
 }

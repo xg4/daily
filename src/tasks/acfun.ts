@@ -1,6 +1,6 @@
 import type { Middleware } from '../types'
 
-export const acfun: Middleware = async (ctx, next) => {
+export const acfun: Middleware = async (ctx) => {
   const { page } = ctx
   await page.goto('https://www.acfun.cn/member/')
 
@@ -14,6 +14,4 @@ export const acfun: Middleware = async (ctx, next) => {
   if ([0, 122].includes(result.result)) {
     ctx.status = 1
   }
-
-  await next()
 }

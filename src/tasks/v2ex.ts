@@ -1,6 +1,6 @@
 import type { Middleware } from '../types'
 
-export const v2ex: Middleware = async (ctx, next) => {
+export const v2ex: Middleware = async (ctx) => {
   const { page } = ctx
   await page.goto('https://www.v2ex.com/mission/daily', {
     waitUntil: 'domcontentloaded',
@@ -26,6 +26,4 @@ export const v2ex: Middleware = async (ctx, next) => {
     )
     ctx.status = 1
   }
-
-  await next()
 }

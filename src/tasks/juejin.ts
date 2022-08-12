@@ -1,6 +1,6 @@
 import type { Middleware } from '../types'
 
-export const juejinLucky: Middleware = async (ctx, next) => {
+export const juejinLucky: Middleware = async (ctx) => {
   const { page } = ctx
 
   await page.goto('https://juejin.cn/user/center/lottery')
@@ -23,11 +23,9 @@ export const juejinLucky: Middleware = async (ctx, next) => {
 
   ctx.status = 1
   ctx.message = result
-
-  await next()
 }
 
-export const juejinLottery: Middleware = async (ctx, next) => {
+export const juejinLottery: Middleware = async (ctx) => {
   const { page } = ctx
   await page.goto('https://juejin.cn/user/center/lottery?t=' + Date.now())
   const btn3 = await page.waitForSelector('#turntable-item-0')
@@ -45,10 +43,9 @@ export const juejinLottery: Middleware = async (ctx, next) => {
 
   ctx.status = 1
   ctx.message = result
-  await next()
 }
 
-export const juejin: Middleware = async (ctx, next) => {
+export const juejin: Middleware = async (ctx) => {
   const { page } = ctx
 
   await page.goto('https://juejin.cn/user/center/signin')
@@ -73,6 +70,4 @@ export const juejin: Middleware = async (ctx, next) => {
     ctx.message = result
     ctx.status = 1
   }
-
-  await next()
 }

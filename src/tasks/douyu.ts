@@ -1,6 +1,6 @@
 import type { Middleware } from '../types'
 
-export const douyu: Middleware = async (ctx, next) => {
+export const douyu: Middleware = async (ctx) => {
   const { page } = ctx
 
   const [_, res] = await Promise.all([
@@ -36,6 +36,4 @@ export const douyu: Middleware = async (ctx, next) => {
   }
 
   ctx.message = online.map((item: any) => item.nickname).join(' / ')
-
-  await next()
 }

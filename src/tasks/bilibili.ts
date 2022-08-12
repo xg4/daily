@@ -1,6 +1,6 @@
 import type { Middleware } from '../types'
 
-export const bilibili: Middleware = async (ctx, next) => {
+export const bilibili: Middleware = async (ctx) => {
   const { page } = ctx
 
   await page.goto('https://live.bilibili.com/')
@@ -14,6 +14,4 @@ export const bilibili: Middleware = async (ctx, next) => {
   if ([0, 1011040].includes(result.code)) {
     ctx.status = 1
   }
-
-  await next()
 }

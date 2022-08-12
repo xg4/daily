@@ -1,5 +1,6 @@
 import type { Middleware } from '@koa/router'
 import { SHA256 } from 'crypto-js'
+import dayjs from 'dayjs'
 import createHttpError from 'http-errors'
 import { isNumber, omit } from 'lodash'
 import { exec, prisma } from '../helpers'
@@ -83,26 +84,32 @@ export const deleteAccount: Middleware = async (ctx) => {
   }
 
   const currentUser = ctx.state.jwt.user
-  const account = await prisma.account.findFirst({
+  const account = await prisma.account.findUnique({
     where: {
       id,
-      authorId: currentUser.id,
     },
   })
-  if (!account) {
-    throw new createHttpError.NotFound('账号不存在')
+  if (account?.authorId !== currentUser.id) {
+    throw new createHttpError.Forbidden('没有权限')
   }
 
-  await prisma.account.delete({
-    where: {
-      id,
-    },
-  })
+  await Promise.all([
+    prisma.record.deleteMany({
+      where: {
+        accountId: id,
+      },
+    }),
+    prisma.account.delete({
+      where: {
+        id,
+      },
+    }),
+  ])
 
   ctx.status = 204
 }
 
-export const getRecords: Middleware = async (ctx) => {
+export const getDailyStatus: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
     throw new createHttpError.BadRequest('请输入账号 id')
@@ -120,7 +127,7 @@ export const getRecords: Middleware = async (ctx) => {
     throw new createHttpError.Forbidden('无权限')
   }
 
-  const records = await prisma.record.findMany({
+  const record = await prisma.record.findFirst({
     where: {
       accountId: id,
       status: 1,
@@ -130,7 +137,11 @@ export const getRecords: Middleware = async (ctx) => {
     },
   })
 
-  ctx.body = records
+  if (!record) {
+    throw new createHttpError.NotFound('没有找到签到记录')
+  }
+
+  ctx.body = dayjs(record.createdAt).isToday()
 }
 
 export const checkIn: Middleware = async (ctx) => {
@@ -157,4 +168,5 @@ export const checkIn: Middleware = async (ctx) => {
   exec.register(account).run()
 
   ctx.status = 201
+  ctx.body = '加入签到队列成功'
 }

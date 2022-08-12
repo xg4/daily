@@ -18,6 +18,7 @@ export const checkIn: Middleware = async (ctx) => {
   exec.register(accounts).run()
 
   ctx.status = 201
+  ctx.body = '加入签到队列成功'
 }
 
 export const profile: Middleware = async (ctx) => {

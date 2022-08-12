@@ -13,7 +13,7 @@ router.get('/:id', accountController.getAccount)
 
 router.delete('/:id', accountController.deleteAccount)
 
-router.get('/:id/records', accountController.getRecords)
+router.get('/:id/daily', accountController.getDailyStatus)
 
 router.post('/:id/daily', accountController.checkIn)
 

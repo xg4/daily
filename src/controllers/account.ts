@@ -276,16 +276,18 @@ export const deleteAccount: Middleware = async (ctx) => {
 }
 
 export const getDailyStatus: Middleware = async (ctx) => {
-  const id = +ctx.params['id']!
-  if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('请输入账号 id')
+  const accountId = +ctx.params['accountId']!
+  const taskId = +ctx.params['taskId']!
+
+  if (!isNumber(taskId) || !isNumber(accountId)) {
+    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
   }
 
   const currentUser = ctx.user
 
   const account = await prisma.account.findUnique({
     where: {
-      id,
+      id: accountId,
     },
   })
 
@@ -295,7 +297,8 @@ export const getDailyStatus: Middleware = async (ctx) => {
 
   const record = await prisma.record.findFirst({
     where: {
-      accountId: id,
+      accountId,
+      taskId,
       status: 1,
     },
     orderBy: {

@@ -21,7 +21,7 @@ router.post('/:accountId/tasks/:taskId', accountController.createTask)
 router.delete('/:accountId/tasks/:taskId', accountController.deleteTask)
 
 // daily
-router.get('/:id/daily', accountController.getDailyStatus)
+router.get('/:accountId/:taskId', accountController.getDailyStatus)
 
 router.post('/:id/daily', accountController.checkInById)
 

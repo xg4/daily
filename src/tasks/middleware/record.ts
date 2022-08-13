@@ -8,6 +8,7 @@ export function record(): Middleware {
     const record = await prisma.record.findFirst({
       where: {
         accountId: ctx.account.id,
+        taskId: ctx.task.id,
         status: 1,
       },
       orderBy: {
@@ -23,6 +24,7 @@ export function record(): Middleware {
     const records = await prisma.record.count({
       where: {
         accountId: ctx.account.id,
+        taskId: ctx.task.id,
         status: 0,
         createdAt: {
           gte: dayjs().startOf('day').toDate(),

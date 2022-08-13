@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import createHttpError from 'http-errors'
 import type { Middleware } from 'koa'
 
-export function errorHandler(): Middleware {
+export function error(): Middleware {
   return async (ctx, next) => {
     return next().catch((err) => {
       if (createHttpError.isHttpError(err)) {

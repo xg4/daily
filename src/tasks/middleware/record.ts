@@ -20,7 +20,7 @@ export function record(): Middleware {
     }
 
     // limit the number of times per day
-    const records = await prisma.record.findMany({
+    const records = await prisma.record.count({
       where: {
         accountId: ctx.account.id,
         status: 0,
@@ -34,7 +34,7 @@ export function record(): Middleware {
       },
     })
 
-    if (records.length >= 5) {
+    if (records >= 5) {
       throw createHttpError('今日执行失败次数过多')
     }
 

@@ -24,7 +24,7 @@ export const createTask: Middleware = async (ctx) => {
     },
   })
 
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
   if (item) {
     throw new createHttpError.BadRequest('任务已存在')
   }
@@ -67,7 +67,7 @@ export const createAccount: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('账号已存在')
   }
 
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
   const account = await prisma.account.create({
     data: {
       name,
@@ -102,7 +102,7 @@ export const createAccount: Middleware = async (ctx) => {
 }
 
 export const getAccounts: Middleware = async (ctx) => {
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
 
   const accounts = await prisma.account.findMany({
     where: {
@@ -133,7 +133,7 @@ export const updateAccount: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('请输入账号 id')
   }
 
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
   const account = await prisma.account.findUnique({
     where: {
       id,
@@ -178,7 +178,7 @@ export const getAccount: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('请输入账号 id')
   }
 
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
   const account = await prisma.account.findUnique({
     where: {
       id,
@@ -209,7 +209,7 @@ export const deleteTask: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('请输入账号 id，任务 id')
   }
 
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
   const item = await prisma.tasksOnAccounts.findUnique({
     where: {
       accountId_taskId: {
@@ -244,7 +244,7 @@ export const deleteAccount: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('请输入账号 id')
   }
 
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
   const account = await prisma.account.findUnique({
     where: {
       id,
@@ -281,7 +281,7 @@ export const getDailyStatus: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('请输入账号 id')
   }
 
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
 
   const account = await prisma.account.findUnique({
     where: {
@@ -316,7 +316,7 @@ export const checkInById: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('请输入账号 id')
   }
 
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
 
   const account = await prisma.account.findUnique({
     where: {
@@ -335,7 +335,7 @@ export const checkInById: Middleware = async (ctx) => {
 }
 
 export const checkIn: Middleware = async (ctx) => {
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
 
   const accounts = await prisma.account.findMany({
     where: {

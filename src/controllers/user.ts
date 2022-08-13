@@ -4,15 +4,9 @@ import { isNumber, pick } from 'lodash'
 import { prisma } from '../helpers'
 
 export const profile: Middleware = async (ctx) => {
-  const currentUser = ctx.state.jwt.user
+  const currentUser = ctx.user
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: currentUser.id,
-    },
-  })
-
-  ctx.body = pick(user, ['id', 'username', 'email'])
+  ctx.body = pick(currentUser, ['id', 'username', 'email'])
 }
 
 export const getUser: Middleware = async (ctx) => {

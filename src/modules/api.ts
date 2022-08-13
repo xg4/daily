@@ -5,7 +5,7 @@ import jwt from 'koa-jwt'
 import logger from 'koa-logger'
 import { get, pick } from 'lodash'
 import { prisma } from '../helpers'
-import { errorHandler } from '../middlewares'
+import { auth, error } from '../middlewares'
 import { router } from '../routes'
 import { tasks } from '../tasks'
 
@@ -33,7 +33,7 @@ if (process.env['NODE_ENV'] !== 'production') {
 }
 
 app
-  .use(errorHandler())
+  .use(error())
   .use(cors())
   .use(body())
   .use(
@@ -41,6 +41,7 @@ app
       path: [/^\/api\/auth/],
     })
   )
+  .use(auth())
   .use(router.routes())
   .use(router.allowedMethods())
 

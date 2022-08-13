@@ -28,6 +28,7 @@ declare module 'koa' {
     iat: number
   }
   interface BaseContext {
+    user: User
     state: {
       jwt: JwtPayload
     }

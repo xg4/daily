@@ -14,7 +14,7 @@ export function cookie(): Middleware {
     } else if (account.cookie) {
       cookies = parseCookies(account.cookie).map((i) => ({
         ...i,
-        domain: ctx.project.domain,
+        domain: ctx.task.domain,
       }))
     }
 

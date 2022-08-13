@@ -1,4 +1,4 @@
-import type { Task } from '../types'
+import type { TaskImpl } from '../types'
 import { acfun } from './acfun'
 import { bilibili } from './bilibili'
 import { douyu } from './douyu'
@@ -6,7 +6,7 @@ import { juejin, juejinLottery, juejinLucky } from './juejin'
 import { music163 } from './music163'
 import { v2ex } from './v2ex'
 
-export const tasks: Task[] = [
+export const tasks: TaskImpl[] = [
   {
     name: 'acfun',
     description: '每日签到',

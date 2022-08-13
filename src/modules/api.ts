@@ -12,13 +12,13 @@ import { tasks } from '../tasks'
 async function initDB() {
   await Promise.all(
     tasks.map(async (t) => {
-      const project = pick(t, ['name', 'description', 'domain'])
-      await prisma.project.upsert({
+      const task = pick(t, ['name', 'description', 'domain'])
+      await prisma.task.upsert({
         where: {
-          name: project.name,
+          name: task.name,
         },
-        create: project,
-        update: project,
+        create: task,
+        update: task,
       })
     })
   )

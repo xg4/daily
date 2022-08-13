@@ -1,8 +1,8 @@
-import type { Account, Prisma, Project, User } from '@prisma/client'
+import type { Account, Prisma, Task, User } from '@prisma/client'
 import type compose from 'koa-compose'
 import type { Browser, Page } from 'puppeteer'
 
-export interface Task extends Prisma.ProjectCreateInput {
+export interface TaskImpl extends Prisma.TaskCreateInput {
   handler: Middleware
 }
 
@@ -13,12 +13,12 @@ type Ctx = {
 
   message: any
   status: number
-} & AccountWithProject
+} & AccountWithTask
 
 export type Middleware = compose.Middleware<Ctx>
 export type ComposedMiddleware = compose.ComposedMiddleware<Ctx>
 
-export type AccountWithProject = { account: Account } & { project: Project }
+export type AccountWithTask = { account: Account } & { task: Task }
 
 declare module 'koa' {
   type JwtUser = Pick<User, 'id' | 'username'>

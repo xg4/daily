@@ -2,7 +2,7 @@ import Router from '@koa/router'
 import { userController } from '../controllers'
 
 const router = new Router({
-  prefix: '/user',
+  prefix: '/users',
 })
 
 router.get('/profile', userController.profile)

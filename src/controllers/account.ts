@@ -1,5 +1,5 @@
 import type { Middleware } from '@koa/router'
-import type { Account, Project } from '@prisma/client'
+import type { Account, Task } from '@prisma/client'
 import { SHA256 } from 'crypto-js'
 import dayjs from 'dayjs'
 import createHttpError from 'http-errors'
@@ -8,25 +8,25 @@ import { exec, prisma } from '../helpers'
 
 const ACCOUNT_OMIT = ['cookie', 'latestCookie']
 
-export const createProject: Middleware = async (ctx) => {
+export const createTask: Middleware = async (ctx) => {
   const accountId = +ctx.params['accountId']!
-  const projectId = +ctx.params['projectId']!
-  if (!isNumber(accountId) || !isNumber(projectId)) {
-    throw new createHttpError.BadRequest('请输入账号 id或项目 id')
+  const taskId = +ctx.params['taskId']!
+  if (!isNumber(accountId) || !isNumber(taskId)) {
+    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
   }
 
-  const item = await prisma.projectsOnAccounts.findUnique({
+  const item = await prisma.tasksOnAccounts.findUnique({
     where: {
-      accountId_projectId: {
+      accountId_taskId: {
         accountId,
-        projectId,
+        taskId,
       },
     },
   })
 
   const currentUser = ctx.state.jwt.user
   if (item) {
-    throw new createHttpError.BadRequest('该项目已经存在')
+    throw new createHttpError.BadRequest('任务已存在')
   }
 
   const account = await prisma.account.findUnique({
@@ -39,10 +39,10 @@ export const createProject: Middleware = async (ctx) => {
     throw new createHttpError.Forbidden('没有权限')
   }
 
-  const newItem = await prisma.projectsOnAccounts.create({
+  const newItem = await prisma.tasksOnAccounts.create({
     data: {
       accountId,
-      projectId,
+      taskId,
     },
   })
 
@@ -50,20 +50,20 @@ export const createProject: Middleware = async (ctx) => {
   ctx.body = newItem
 }
 
-export const create: Middleware = async (ctx) => {
-  const { cookie, projectIds, name, description } = ctx.request.body
+export const createAccount: Middleware = async (ctx) => {
+  const { cookie, taskIds, name, description } = ctx.request.body
 
-  if (!cookie) {
-    throw new createHttpError.BadRequest('cookie 不能为空')
+  if (!cookie || !name) {
+    throw new createHttpError.BadRequest('cookie或name 不能为空')
   }
 
   const cookieHash = SHA256(cookie).toString()
-  const savedCookie = await prisma.account.findUnique({
+  const savedAccount = await prisma.account.findFirst({
     where: {
-      cookieHash,
+      OR: [{ cookieHash }, { name }],
     },
   })
-  if (savedCookie) {
+  if (savedAccount) {
     throw new createHttpError.BadRequest('账号已存在')
   }
 
@@ -78,30 +78,30 @@ export const create: Middleware = async (ctx) => {
     },
   })
 
-  let projects: Project[] = []
-  if (isArray(projectIds)) {
-    const ids = projectIds.filter(isNumber)
+  let tasks: Task[] = []
+  if (isArray(taskIds)) {
+    const ids = taskIds.filter(isNumber)
     const list = await prisma.$transaction(
       ids.map((id) =>
-        prisma.projectsOnAccounts.create({
+        prisma.tasksOnAccounts.create({
           data: {
             accountId: account.id,
-            projectId: id,
+            taskId: id,
           },
           include: {
-            project: true,
+            task: true,
           },
         })
       )
     )
-    projects = list.map((i) => i.project)
+    tasks = list.map((i) => i.task)
   }
 
   ctx.status = 201
-  ctx.body = omit(merge(account, { projects }), ACCOUNT_OMIT)
+  ctx.body = merge(omit(account, ACCOUNT_OMIT), { tasks })
 }
 
-export const getAll: Middleware = async (ctx) => {
+export const getAccounts: Middleware = async (ctx) => {
   const currentUser = ctx.state.jwt.user
 
   const accounts = await prisma.account.findMany({
@@ -112,22 +112,22 @@ export const getAll: Middleware = async (ctx) => {
 
   ctx.body = await Promise.all(
     accounts.map(async (account) => {
-      const list = await prisma.projectsOnAccounts.findMany({
+      const list = await prisma.tasksOnAccounts.findMany({
         where: {
           accountId: account.id,
         },
         include: {
-          project: true,
+          task: true,
         },
       })
       return merge(omit(account, ACCOUNT_OMIT), {
-        projects: list.map((i) => i.project),
+        tasks: list.map((i) => i.task),
       })
     })
   )
 }
 
-export const updateOne: Middleware = async (ctx) => {
+export const updateAccount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
     throw new createHttpError.BadRequest('请输入账号 id')
@@ -149,30 +149,30 @@ export const updateOne: Middleware = async (ctx) => {
     },
     data: pick(ctx.request.body, ['name', 'description']),
   })
-  const { projectIds } = ctx.request.body
-  let projects: Project[] = []
-  if (isArray(projectIds)) {
-    const ids = projectIds.filter(isNumber)
-    const _projects = await prisma.$transaction(
+  const { taskIds } = ctx.request.body
+  let tasks: Task[] = []
+  if (isArray(taskIds)) {
+    const ids = taskIds.filter(isNumber)
+    const list = await prisma.$transaction(
       ids.map((id) =>
-        prisma.projectsOnAccounts.create({
+        prisma.tasksOnAccounts.create({
           data: {
             accountId: newAccount.id,
-            projectId: id,
+            taskId: id,
           },
           include: {
-            project: true,
+            task: true,
           },
         })
       )
     )
-    projects = _projects.map((i) => i.project)
+    tasks = list.map((i) => i.task)
   }
 
-  ctx.body = omit(merge(newAccount, { projects }), ACCOUNT_OMIT)
+  ctx.body = merge(omit(newAccount, ACCOUNT_OMIT), { tasks })
 }
 
-export const getOne: Middleware = async (ctx) => {
+export const getAccount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
     throw new createHttpError.BadRequest('请输入账号 id')
@@ -183,34 +183,38 @@ export const getOne: Middleware = async (ctx) => {
     where: {
       id,
     },
-    include: {
-      projects: {
-        include: {
-          project: true,
-        },
-      },
-    },
   })
   if (account?.authorId !== currentUser.id) {
     throw new createHttpError.Forbidden('无权限')
   }
 
-  ctx.body = omit(account, ACCOUNT_OMIT)
+  const list = await prisma.tasksOnAccounts.findMany({
+    where: {
+      accountId: account.id,
+    },
+    include: {
+      task: true,
+    },
+  })
+
+  ctx.body = merge(omit(account, ACCOUNT_OMIT), {
+    tasks: list.map((i) => i.task),
+  })
 }
 
-export const deleteProject: Middleware = async (ctx) => {
+export const deleteTask: Middleware = async (ctx) => {
   const accountId = +ctx.params['accountId']!
-  const projectId = +ctx.params['projectId']!
-  if (!isNumber(accountId) || !isNumber(projectId)) {
-    throw new createHttpError.BadRequest('请输入账号 id或项目 id')
+  const taskId = +ctx.params['taskId']!
+  if (!isNumber(accountId) || !isNumber(taskId)) {
+    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
   }
 
   const currentUser = ctx.state.jwt.user
-  const item = await prisma.projectsOnAccounts.findUnique({
+  const item = await prisma.tasksOnAccounts.findUnique({
     where: {
-      accountId_projectId: {
+      accountId_taskId: {
         accountId,
-        projectId,
+        taskId,
       },
     },
     include: {
@@ -222,11 +226,11 @@ export const deleteProject: Middleware = async (ctx) => {
     throw new createHttpError.Forbidden('无权限')
   }
 
-  await prisma.projectsOnAccounts.delete({
+  await prisma.tasksOnAccounts.delete({
     where: {
-      accountId_projectId: {
+      accountId_taskId: {
         accountId,
-        projectId,
+        taskId,
       },
     },
   })
@@ -251,7 +255,7 @@ export const deleteAccount: Middleware = async (ctx) => {
   }
 
   await prisma.$transaction([
-    prisma.projectsOnAccounts.deleteMany({
+    prisma.tasksOnAccounts.deleteMany({
       where: {
         accountId: id,
       },
@@ -355,14 +359,14 @@ async function register(account: Account | Account[]): Promise<void> {
     return
   }
 
-  const list = await prisma.projectsOnAccounts.findMany({
+  const list = await prisma.tasksOnAccounts.findMany({
     where: {
       accountId: account.id,
     },
     include: {
-      project: true,
+      task: true,
     },
   })
 
-  exec.register(list.map((item) => ({ account, project: item.project })))
+  exec.register(list.map((item) => ({ account, task: item.task })))
 }

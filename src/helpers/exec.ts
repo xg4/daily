@@ -3,7 +3,7 @@ import { noop } from 'lodash'
 import puppeteer, { Browser } from 'puppeteer'
 import { tasks } from '../tasks'
 import { cookie, init, logger, record } from '../tasks/middleware'
-import type { AccountWithProject, ComposedMiddleware } from '../types'
+import type { AccountWithTask, ComposedMiddleware } from '../types'
 
 export default class Executor {
   static browser?: Browser
@@ -23,9 +23,9 @@ export default class Executor {
   private queue: ComposedMiddleware[] = []
   private running = false
 
-  register(state: AccountWithProject[]): Executor
-  register(state: AccountWithProject): Executor
-  register(state: AccountWithProject | AccountWithProject[]): Executor {
+  register(state: AccountWithTask[]): Executor
+  register(state: AccountWithTask): Executor
+  register(state: AccountWithTask | AccountWithTask[]): Executor {
     if (Array.isArray(state)) {
       for (const item of state) {
         this.register.call(this, item)
@@ -33,7 +33,7 @@ export default class Executor {
       return this
     }
 
-    const task = tasks.find((t) => t.name === state.project.name)
+    const task = tasks.find((t) => t.name === state.task.name)
     if (!task) {
       return this
     }

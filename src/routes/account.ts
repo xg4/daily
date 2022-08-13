@@ -2,23 +2,23 @@ import Router from '@koa/router'
 import { accountController } from '../controllers'
 
 const router = new Router({
-  prefix: '/account',
+  prefix: '/accounts',
 })
 
-router.get('/', accountController.getAll)
+router.get('/', accountController.getAccounts)
 
-router.post('/', accountController.create)
+router.post('/', accountController.createAccount)
 
-router.get('/:id', accountController.getOne)
+router.get('/:id', accountController.getAccount)
 
-router.patch('/:id', accountController.updateOne)
+router.patch('/:id', accountController.updateAccount)
 
 router.delete('/:id', accountController.deleteAccount)
 
-// project
-router.post('/:accountId/project/:projectId', accountController.createProject)
+// task
+router.post('/:accountId/tasks/:taskId', accountController.createTask)
 
-router.delete('/:accountId/project/:projectId', accountController.deleteProject)
+router.delete('/:accountId/tasks/:taskId', accountController.deleteTask)
 
 // daily
 router.get('/:id/daily', accountController.getDailyStatus)

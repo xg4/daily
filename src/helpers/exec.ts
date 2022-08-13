@@ -9,7 +9,7 @@ export default class Executor {
   static browser?: Browser
 
   static async getBrowser() {
-    if (!this.browser) {
+    if (!this.browser || !this.browser.isConnected()) {
       this.browser = await puppeteer.launch({
         ignoreHTTPSErrors: true,
         headless: true,
@@ -76,7 +76,9 @@ export default class Executor {
 
     this.running = false
     if (this.queue.length) {
-      this.run()
+      await this.run()
+    } else {
+      await browser.close()
     }
   }
 }

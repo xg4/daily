@@ -11,8 +11,16 @@ router.post('/', accountController.create)
 
 router.get('/:id', accountController.getOne)
 
+router.patch('/:id', accountController.updateOne)
+
 router.delete('/:id', accountController.deleteAccount)
 
+// project
+router.post('/:accountId/project/:projectId', accountController.createProject)
+
+router.delete('/:accountId/project/:projectId', accountController.deleteProject)
+
+// daily
 router.get('/:id/daily', accountController.getDailyStatus)
 
 router.post('/:id/daily', accountController.checkInById)

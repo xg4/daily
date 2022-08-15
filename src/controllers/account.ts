@@ -1,10 +1,17 @@
 import type { Middleware } from '@koa/router'
 import { SHA256 } from 'crypto-js'
 import createHttpError from 'http-errors'
-import { isArray, isInteger, merge, omit, pick } from 'lodash'
+import {
+  difference,
+  intersection,
+  isArray,
+  isInteger,
+  merge,
+  omit,
+} from 'lodash'
 import { prisma } from '../helpers'
 
-const ACCOUNT_OMIT = ['cookie', 'latestCookie']
+const ACCOUNT_OMIT: string[] = []
 
 export const createAccount: Middleware = async (ctx) => {
   const { cookie, taskIds, name, description } = ctx.request.body
@@ -81,6 +88,51 @@ export const getAccounts: Middleware = async (ctx) => {
   )
 }
 
+async function diffTasks(accountId: number, ids: number[]) {
+  const allProjects = await prisma.project.findMany({
+    where: {
+      accountId,
+    },
+  })
+  const allIds = allProjects.map((i) => i.taskId)
+  const newIds = difference(ids, allIds)
+  const projects = await prisma.$transaction(
+    newIds.map((id) =>
+      prisma.project.create({
+        data: {
+          accountId,
+          taskId: id,
+        },
+        include: {
+          task: true,
+        },
+      })
+    )
+  )
+  const deletedIds = difference(allIds, ids)
+  await prisma.project.deleteMany({
+    where: {
+      accountId,
+      taskId: {
+        in: deletedIds,
+      },
+    },
+  })
+  const savedIds = intersection(allIds, ids)
+  const savedProjects = await prisma.project.findMany({
+    where: {
+      accountId,
+      taskId: {
+        in: savedIds,
+      },
+    },
+    include: {
+      task: true,
+    },
+  })
+  return projects.concat(savedProjects).map((item) => item.task)
+}
+
 export const updateAccount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isInteger(id)) {
@@ -97,29 +149,23 @@ export const updateAccount: Middleware = async (ctx) => {
     throw new createHttpError.Forbidden('无权限')
   }
 
+  const { cookie, name, description } = ctx.request.body
+
   const newAccount = await prisma.account.update({
     where: {
       id,
     },
-    data: pick(ctx.request.body, ['name', 'description']),
+    data: {
+      name,
+      description,
+      cookie,
+      cookieHash: SHA256(cookie).toString(),
+    },
   })
 
   const { taskIds } = ctx.request.body
   const ids = isArray(taskIds) ? taskIds.map(Number).filter(isInteger) : []
-  const projects = await prisma.$transaction(
-    ids.map((id) =>
-      prisma.project.create({
-        data: {
-          accountId: newAccount.id,
-          taskId: id,
-        },
-        include: {
-          task: true,
-        },
-      })
-    )
-  )
-  const tasks = projects.map((i) => i.task)
+  const tasks = await diffTasks(id, ids)
 
   ctx.body = merge(omit(newAccount, ACCOUNT_OMIT), { tasks })
 }

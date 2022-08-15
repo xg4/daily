@@ -11,7 +11,7 @@ router.post('/', accountController.createAccount)
 
 router.get('/:id', accountController.getAccount)
 
-router.patch('/:id', accountController.updateAccount)
+router.put('/:id', accountController.updateAccount)
 
 router.delete('/:id', accountController.deleteAccount)
 

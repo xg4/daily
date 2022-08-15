@@ -1,5 +1,6 @@
 export * as accountController from './account'
 export * as authController from './auth'
+export * as projectController from './project'
 export * as recordController from './record'
 export * as taskController from './task'
 export * as userController from './user'

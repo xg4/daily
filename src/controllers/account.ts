@@ -1,54 +1,11 @@
 import type { Middleware } from '@koa/router'
-import type { Account, Task } from '@prisma/client'
+import type { Task } from '@prisma/client'
 import { SHA256 } from 'crypto-js'
-import dayjs from 'dayjs'
 import createHttpError from 'http-errors'
 import { isArray, isNumber, merge, omit, pick } from 'lodash'
-import { exec, prisma } from '../helpers'
+import { prisma } from '../helpers'
 
 const ACCOUNT_OMIT = ['cookie', 'latestCookie']
-
-export const createTask: Middleware = async (ctx) => {
-  const accountId = +ctx.params['accountId']!
-  const taskId = +ctx.params['taskId']!
-  if (!isNumber(accountId) || !isNumber(taskId)) {
-    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
-  }
-
-  const project = await prisma.project.findUnique({
-    where: {
-      accountId_taskId: {
-        accountId,
-        taskId,
-      },
-    },
-  })
-
-  const currentUser = ctx.user
-  if (project) {
-    throw new createHttpError.BadRequest('任务已存在')
-  }
-
-  const account = await prisma.account.findUnique({
-    where: {
-      id: accountId,
-    },
-  })
-
-  if (account?.authorId !== currentUser.id) {
-    throw new createHttpError.Forbidden('没有权限')
-  }
-
-  const newItem = await prisma.project.create({
-    data: {
-      accountId,
-      taskId,
-    },
-  })
-
-  ctx.status = 201
-  ctx.body = newItem
-}
 
 export const createAccount: Middleware = async (ctx) => {
   const { cookie, taskIds, name, description } = ctx.request.body
@@ -58,9 +15,9 @@ export const createAccount: Middleware = async (ctx) => {
   }
 
   const cookieHash = SHA256(cookie).toString()
-  const savedAccount = await prisma.account.findFirst({
+  const savedAccount = await prisma.account.findUnique({
     where: {
-      OR: [{ cookieHash }, { name }],
+      cookieHash,
     },
   })
   if (savedAccount) {
@@ -78,27 +35,25 @@ export const createAccount: Middleware = async (ctx) => {
     },
   })
 
-  let tasks: Task[] = []
-  if (isArray(taskIds)) {
-    const ids = taskIds.filter(isNumber)
-    const list = await prisma.$transaction(
-      ids.map((id) =>
-        prisma.project.create({
-          data: {
-            accountId: account.id,
-            taskId: id,
-          },
-          include: {
-            task: true,
-          },
-        })
-      )
+  const ids = isArray(taskIds) ? taskIds.map(Number).filter(isNumber) : []
+  const projects = await prisma.$transaction(
+    ids.map((id) =>
+      prisma.project.create({
+        data: {
+          accountId: account.id,
+          taskId: id,
+        },
+        include: {
+          task: true,
+        },
+      })
     )
-    tasks = list.map((i) => i.task)
-  }
+  )
 
   ctx.status = 201
-  ctx.body = merge(omit(account, ACCOUNT_OMIT), { tasks })
+  ctx.body = merge(omit(account, ACCOUNT_OMIT), {
+    tasks: projects.map((item) => item.task),
+  })
 }
 
 export const getAccounts: Middleware = async (ctx) => {
@@ -112,7 +67,7 @@ export const getAccounts: Middleware = async (ctx) => {
 
   ctx.body = await Promise.all(
     accounts.map(async (account) => {
-      const list = await prisma.project.findMany({
+      const projects = await prisma.project.findMany({
         where: {
           accountId: account.id,
         },
@@ -121,7 +76,7 @@ export const getAccounts: Middleware = async (ctx) => {
         },
       })
       return merge(omit(account, ACCOUNT_OMIT), {
-        tasks: list.map((i) => i.task),
+        tasks: projects.map((i) => i.task),
       })
     })
   )
@@ -202,42 +157,6 @@ export const getAccount: Middleware = async (ctx) => {
   })
 }
 
-export const deleteTask: Middleware = async (ctx) => {
-  const accountId = +ctx.params['accountId']!
-  const taskId = +ctx.params['taskId']!
-  if (!isNumber(accountId) || !isNumber(taskId)) {
-    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
-  }
-
-  const currentUser = ctx.user
-  const item = await prisma.project.findUnique({
-    where: {
-      accountId_taskId: {
-        accountId,
-        taskId,
-      },
-    },
-    include: {
-      account: true,
-    },
-  })
-
-  if (item?.account.authorId !== currentUser.id) {
-    throw new createHttpError.Forbidden('无权限')
-  }
-
-  await prisma.project.delete({
-    where: {
-      accountId_taskId: {
-        accountId,
-        taskId,
-      },
-    },
-  })
-
-  ctx.status = 204
-}
-
 export const deleteAccount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
   if (!isNumber(id)) {
@@ -273,103 +192,4 @@ export const deleteAccount: Middleware = async (ctx) => {
   ])
 
   ctx.status = 204
-}
-
-export const getDailyStatus: Middleware = async (ctx) => {
-  const accountId = +ctx.params['accountId']!
-  const taskId = +ctx.params['taskId']!
-
-  if (!isNumber(taskId) || !isNumber(accountId)) {
-    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
-  }
-
-  const currentUser = ctx.user
-
-  const account = await prisma.account.findUnique({
-    where: {
-      id: accountId,
-    },
-  })
-
-  if (account?.authorId !== currentUser.id) {
-    throw new createHttpError.Forbidden('无权限')
-  }
-
-  const record = await prisma.record.findFirst({
-    where: {
-      accountId,
-      taskId,
-      status: 1,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  })
-
-  if (!record) {
-    throw new createHttpError.NotFound('没有找到签到记录')
-  }
-
-  ctx.body = dayjs(record.createdAt).isToday()
-}
-
-export const checkInById: Middleware = async (ctx) => {
-  const id = +ctx.params['id']!
-  if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('请输入账号 id')
-  }
-
-  const currentUser = ctx.user
-
-  const account = await prisma.account.findUnique({
-    where: {
-      id,
-    },
-  })
-
-  if (account?.authorId !== currentUser.id) {
-    throw new createHttpError.Forbidden('无权限')
-  }
-
-  await register(account)
-
-  ctx.status = 201
-  ctx.body = '加入签到队列成功'
-}
-
-export const checkIn: Middleware = async (ctx) => {
-  const currentUser = ctx.user
-
-  const accounts = await prisma.account.findMany({
-    where: {
-      authorId: currentUser.id,
-    },
-  })
-
-  await register(accounts)
-
-  ctx.status = 201
-  ctx.body = '加入签到队列成功'
-}
-
-function register(account: Account[]): Promise<void>
-function register(account: Account): Promise<void>
-async function register(account: Account | Account[]): Promise<void> {
-  if (Array.isArray(account)) {
-    for (const item of account) {
-      await register(item)
-    }
-    return
-  }
-
-  const list = await prisma.project.findMany({
-    where: {
-      accountId: account.id,
-    },
-    include: {
-      task: true,
-    },
-  })
-
-  exec.register(list.map((item) => ({ account, task: item.task })))
 }

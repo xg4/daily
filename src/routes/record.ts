@@ -9,4 +9,6 @@ router.get('/', recordController.getRecords)
 
 router.get('/today', recordController.getTodayRecords)
 
+router.get('/latest', recordController.getLatestRecord)
+
 export { router as recordRouter }

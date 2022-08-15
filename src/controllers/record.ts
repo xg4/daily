@@ -101,9 +101,9 @@ export const getTodayRecords: Middleware = async (ctx) => {
   ctx.body = records.map(filterRecord)
 }
 
-export const getDailyStatus: Middleware = async (ctx) => {
-  const accountId = +ctx.params['accountId']!
-  const taskId = +ctx.params['taskId']!
+export const getLatestRecord: Middleware = async (ctx) => {
+  const accountId = +ctx.query['accountId']!
+  const taskId = +ctx.query['taskId']!
 
   if (!isNumber(taskId) || !isNumber(accountId)) {
     throw new createHttpError.BadRequest('请输入账号 id，任务 id')
@@ -111,21 +111,16 @@ export const getDailyStatus: Middleware = async (ctx) => {
 
   const currentUser = ctx.user
 
-  const account = await prisma.account.findUnique({
-    where: {
-      id: accountId,
-    },
-  })
-
-  if (account?.authorId !== currentUser.id) {
-    throw new createHttpError.Forbidden('无权限')
-  }
-
   const record = await prisma.record.findFirst({
     where: {
       accountId,
       taskId,
       status: 1,
+      project: {
+        account: {
+          authorId: currentUser.id,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',

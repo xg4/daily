@@ -1,6 +1,7 @@
 import Router from '@koa/router'
 import { accountRouter } from './account'
 import { authRouter } from './auth'
+import { recordRouter } from './record'
 import { taskRouter } from './task'
 import { userRouter } from './user'
 
@@ -11,3 +12,4 @@ router
   .use(userRouter.routes())
   .use(authRouter.routes())
   .use(accountRouter.routes())
+  .use(recordRouter.routes())

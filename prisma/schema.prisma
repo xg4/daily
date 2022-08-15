@@ -25,24 +25,27 @@ model Task {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  name        String            @unique
+  name        String    @unique
   description String?
   domain      String
-  accounts    TasksOnAccounts[]
-  records     Record[]
+  projects    Project[]
 
   @@index([name])
   @@map("tasks")
 }
 
-model TasksOnAccounts {
+model Project {
+  createdAt DateTime @default(now()) @map("created_at")
+
   account   Account  @relation(fields: [accountId], references: [id])
   accountId Int      @map("account_id")
   task      Task     @relation(fields: [taskId], references: [id])
   taskId    Int      @map("task_id")
-  createdAt DateTime @default(now()) @map("assigned_at")
+  records   Record[]
 
   @@id([accountId, taskId])
+  @@index([accountId, taskId])
+  @@map("projects")
 }
 
 model Account {
@@ -53,12 +56,11 @@ model Account {
   name         String
   description  String?
   cookie       String
-  cookieHash   String            @unique @map("cookie_hash")
-  latestCookie String?           @map("latest_cookie")
-  tasks        TasksOnAccounts[]
-  author       User              @relation(fields: [authorId], references: [id])
-  authorId     Int               @map("author_id")
-  records      Record[]
+  cookieHash   String    @unique @map("cookie_hash")
+  latestCookie String?   @map("latest_cookie")
+  projects     Project[]
+  author       User      @relation(fields: [authorId], references: [id])
+  authorId     Int       @map("author_id")
 
   @@index([authorId])
   @@map("accounts")
@@ -71,10 +73,9 @@ model Record {
 
   message   String
   status    Int
-  accountId Int     @map("account_id")
-  account   Account @relation(fields: [accountId], references: [id])
-  task      Task    @relation(fields: [taskId], references: [id])
+  project   Project @relation(fields: [taskId, accountId], references: [taskId, accountId])
   taskId    Int     @map("task_id")
+  accountId Int     @map("account_id")
 
   @@index([accountId])
   @@map("records")

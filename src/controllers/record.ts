@@ -1,5 +1,5 @@
 import type { Middleware } from '@koa/router'
-import type { Account, Record, Task } from '@prisma/client'
+import type { Account, Project, Record, Task } from '@prisma/client'
 import dayjs from 'dayjs'
 import createHttpError from 'http-errors'
 import { isNumber, merge, pick } from 'lodash'
@@ -7,14 +7,16 @@ import { prisma } from '../helpers'
 
 function filterRecord(
   record: Record & {
-    task: Task
-    account: Account
+    project: Project & {
+      task: Task
+      account: Account
+    }
   }
 ) {
   return merge(
     pick(record, ['id', 'accountId', 'taskId', 'createdAt', 'status']),
     {
-      name: `[${record.task.name}]: ${record.account.name}`,
+      name: `[${record.project.task.name}]: ${record.project.account.name}`,
     }
   )
 }
@@ -22,7 +24,7 @@ function filterRecord(
 export const getRecords: Middleware = async (ctx) => {
   const currentUser = ctx.user
 
-  const packages = await prisma.tasksOnAccounts.findMany({
+  const packages = await prisma.project.findMany({
     where: {
       account: {
         authorId: currentUser.id,
@@ -44,8 +46,12 @@ export const getRecords: Middleware = async (ctx) => {
       createdAt: 'desc',
     },
     include: {
-      task: true,
-      account: true,
+      project: {
+        include: {
+          task: true,
+          account: true,
+        },
+      },
     },
   })
 
@@ -55,7 +61,7 @@ export const getRecords: Middleware = async (ctx) => {
 export const getTodayRecords: Middleware = async (ctx) => {
   const currentUser = ctx.user
 
-  const packages = await prisma.tasksOnAccounts.findMany({
+  const packages = await prisma.project.findMany({
     where: {
       account: {
         authorId: currentUser.id,
@@ -83,8 +89,12 @@ export const getTodayRecords: Middleware = async (ctx) => {
       createdAt: 'desc',
     },
     include: {
-      account: true,
-      task: true,
+      project: {
+        include: {
+          task: true,
+          account: true,
+        },
+      },
     },
   })
 

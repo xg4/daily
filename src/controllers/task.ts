@@ -34,7 +34,7 @@ export const getCount: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('请输入任务 id')
   }
 
-  ctx.body = await prisma.tasksOnAccounts.count({
+  ctx.body = await prisma.project.count({
     where: {
       taskId: id,
     },

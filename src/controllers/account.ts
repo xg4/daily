@@ -15,7 +15,7 @@ export const createTask: Middleware = async (ctx) => {
     throw new createHttpError.BadRequest('请输入账号 id，任务 id')
   }
 
-  const item = await prisma.tasksOnAccounts.findUnique({
+  const project = await prisma.project.findUnique({
     where: {
       accountId_taskId: {
         accountId,
@@ -25,7 +25,7 @@ export const createTask: Middleware = async (ctx) => {
   })
 
   const currentUser = ctx.user
-  if (item) {
+  if (project) {
     throw new createHttpError.BadRequest('任务已存在')
   }
 
@@ -39,7 +39,7 @@ export const createTask: Middleware = async (ctx) => {
     throw new createHttpError.Forbidden('没有权限')
   }
 
-  const newItem = await prisma.tasksOnAccounts.create({
+  const newItem = await prisma.project.create({
     data: {
       accountId,
       taskId,
@@ -83,7 +83,7 @@ export const createAccount: Middleware = async (ctx) => {
     const ids = taskIds.filter(isNumber)
     const list = await prisma.$transaction(
       ids.map((id) =>
-        prisma.tasksOnAccounts.create({
+        prisma.project.create({
           data: {
             accountId: account.id,
             taskId: id,
@@ -112,7 +112,7 @@ export const getAccounts: Middleware = async (ctx) => {
 
   ctx.body = await Promise.all(
     accounts.map(async (account) => {
-      const list = await prisma.tasksOnAccounts.findMany({
+      const list = await prisma.project.findMany({
         where: {
           accountId: account.id,
         },
@@ -155,7 +155,7 @@ export const updateAccount: Middleware = async (ctx) => {
     const ids = taskIds.filter(isNumber)
     const list = await prisma.$transaction(
       ids.map((id) =>
-        prisma.tasksOnAccounts.create({
+        prisma.project.create({
           data: {
             accountId: newAccount.id,
             taskId: id,
@@ -188,7 +188,7 @@ export const getAccount: Middleware = async (ctx) => {
     throw new createHttpError.Forbidden('无权限')
   }
 
-  const list = await prisma.tasksOnAccounts.findMany({
+  const list = await prisma.project.findMany({
     where: {
       accountId: account.id,
     },
@@ -210,7 +210,7 @@ export const deleteTask: Middleware = async (ctx) => {
   }
 
   const currentUser = ctx.user
-  const item = await prisma.tasksOnAccounts.findUnique({
+  const item = await prisma.project.findUnique({
     where: {
       accountId_taskId: {
         accountId,
@@ -226,7 +226,7 @@ export const deleteTask: Middleware = async (ctx) => {
     throw new createHttpError.Forbidden('无权限')
   }
 
-  await prisma.tasksOnAccounts.delete({
+  await prisma.project.delete({
     where: {
       accountId_taskId: {
         accountId,
@@ -255,7 +255,7 @@ export const deleteAccount: Middleware = async (ctx) => {
   }
 
   await prisma.$transaction([
-    prisma.tasksOnAccounts.deleteMany({
+    prisma.project.deleteMany({
       where: {
         accountId: id,
       },
@@ -362,7 +362,7 @@ async function register(account: Account | Account[]): Promise<void> {
     return
   }
 
-  const list = await prisma.tasksOnAccounts.findMany({
+  const list = await prisma.project.findMany({
     where: {
       accountId: account.id,
     },

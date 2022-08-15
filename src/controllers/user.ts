@@ -1,6 +1,6 @@
 import type { Middleware } from '@koa/router'
 import createHttpError from 'http-errors'
-import { isNumber, pick } from 'lodash'
+import { isInteger, pick } from 'lodash'
 import { prisma } from '../helpers'
 
 export const profile: Middleware = async (ctx) => {
@@ -11,8 +11,8 @@ export const profile: Middleware = async (ctx) => {
 
 export const getUser: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
-  if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('请输入用户 id')
+  if (!isInteger(id)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const user = await prisma.user.findUnique({

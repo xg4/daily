@@ -1,6 +1,6 @@
 import type { Middleware } from '@koa/router'
 import createHttpError from 'http-errors'
-import { isNumber } from 'lodash'
+import { isInteger } from 'lodash'
 import { exec, prisma } from '../helpers'
 
 export const getProjects: Middleware = async (ctx) => {
@@ -30,8 +30,8 @@ export const getProjects: Middleware = async (ctx) => {
 export const createProject: Middleware = async (ctx) => {
   const accountId = +ctx.request.body['accountId']!
   const taskId = +ctx.request.body['taskId']!
-  if (!isNumber(accountId) || !isNumber(taskId)) {
-    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
+  if (![accountId, taskId].every(isInteger)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const savedProject = await prisma.project.findUnique({
@@ -70,10 +70,11 @@ export const createProject: Middleware = async (ctx) => {
 }
 
 export const deleteProject: Middleware = async (ctx) => {
-  const accountId = +ctx.request.body['accountId']!
-  const taskId = +ctx.request.body['taskId']!
-  if (!isNumber(accountId) || !isNumber(taskId)) {
-    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
+  const accountId = +ctx.params['accountId']!
+  const taskId = +ctx.params['taskId']!
+
+  if (![accountId, taskId].every(isInteger)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const currentUser = ctx.user
@@ -108,8 +109,8 @@ export const deleteProject: Middleware = async (ctx) => {
 export const checkIn: Middleware = async (ctx) => {
   const accountId = +ctx.request.body['accountId']!
   const taskId = +ctx.request.body['taskId']!
-  if (!isNumber(accountId) || !isNumber(taskId)) {
-    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
+  if (![accountId, taskId].every(isInteger)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const currentUser = ctx.user

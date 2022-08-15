@@ -2,7 +2,7 @@ import type { Middleware } from '@koa/router'
 import type { Account, Project, Record, Task } from '@prisma/client'
 import dayjs from 'dayjs'
 import createHttpError from 'http-errors'
-import { isNumber, merge, pick } from 'lodash'
+import { isInteger, merge, pick } from 'lodash'
 import { prisma } from '../helpers'
 
 function filterRecord(
@@ -105,8 +105,8 @@ export const getLatestRecord: Middleware = async (ctx) => {
   const accountId = +ctx.query['accountId']!
   const taskId = +ctx.query['taskId']!
 
-  if (!isNumber(taskId) || !isNumber(accountId)) {
-    throw new createHttpError.BadRequest('请输入账号 id，任务 id')
+  if (![accountId, taskId].every(isInteger)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const currentUser = ctx.user

@@ -9,7 +9,7 @@ router.get('/', projectController.getProjects)
 
 router.post('/', projectController.createProject)
 
-router.delete('/', projectController.deleteProject)
+router.delete('/:accountId/:taskId', projectController.deleteProject)
 
 router.post('/check-in', projectController.checkIn)
 

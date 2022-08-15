@@ -1,8 +1,7 @@
 import type { Middleware } from '@koa/router'
-import type { Task } from '@prisma/client'
 import { SHA256 } from 'crypto-js'
 import createHttpError from 'http-errors'
-import { isArray, isNumber, merge, omit, pick } from 'lodash'
+import { isArray, isInteger, merge, omit, pick } from 'lodash'
 import { prisma } from '../helpers'
 
 const ACCOUNT_OMIT = ['cookie', 'latestCookie']
@@ -11,7 +10,7 @@ export const createAccount: Middleware = async (ctx) => {
   const { cookie, taskIds, name, description } = ctx.request.body
 
   if (!cookie || !name) {
-    throw new createHttpError.BadRequest('cookie或name 不能为空')
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const cookieHash = SHA256(cookie).toString()
@@ -35,7 +34,7 @@ export const createAccount: Middleware = async (ctx) => {
     },
   })
 
-  const ids = isArray(taskIds) ? taskIds.map(Number).filter(isNumber) : []
+  const ids = isArray(taskIds) ? taskIds.map(Number).filter(isInteger) : []
   const projects = await prisma.$transaction(
     ids.map((id) =>
       prisma.project.create({
@@ -84,8 +83,8 @@ export const getAccounts: Middleware = async (ctx) => {
 
 export const updateAccount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
-  if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('请输入账号 id')
+  if (!isInteger(id)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const currentUser = ctx.user
@@ -104,33 +103,31 @@ export const updateAccount: Middleware = async (ctx) => {
     },
     data: pick(ctx.request.body, ['name', 'description']),
   })
+
   const { taskIds } = ctx.request.body
-  let tasks: Task[] = []
-  if (isArray(taskIds)) {
-    const ids = taskIds.filter(isNumber)
-    const list = await prisma.$transaction(
-      ids.map((id) =>
-        prisma.project.create({
-          data: {
-            accountId: newAccount.id,
-            taskId: id,
-          },
-          include: {
-            task: true,
-          },
-        })
-      )
+  const ids = isArray(taskIds) ? taskIds.map(Number).filter(isInteger) : []
+  const projects = await prisma.$transaction(
+    ids.map((id) =>
+      prisma.project.create({
+        data: {
+          accountId: newAccount.id,
+          taskId: id,
+        },
+        include: {
+          task: true,
+        },
+      })
     )
-    tasks = list.map((i) => i.task)
-  }
+  )
+  const tasks = projects.map((i) => i.task)
 
   ctx.body = merge(omit(newAccount, ACCOUNT_OMIT), { tasks })
 }
 
 export const getAccount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
-  if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('请输入账号 id')
+  if (!isInteger(id)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const currentUser = ctx.user
@@ -159,8 +156,8 @@ export const getAccount: Middleware = async (ctx) => {
 
 export const deleteAccount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
-  if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('请输入账号 id')
+  if (!isInteger(id)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const currentUser = ctx.user

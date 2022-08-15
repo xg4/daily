@@ -1,6 +1,6 @@
 import type { Middleware } from '@koa/router'
 import createHttpError from 'http-errors'
-import { isNumber } from 'lodash'
+import { isInteger } from 'lodash'
 import { prisma } from '../helpers'
 
 export const getTasks: Middleware = async (ctx) => {
@@ -13,8 +13,8 @@ export const getTasks: Middleware = async (ctx) => {
 
 export const getTask: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
-  if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('请输入任务 id')
+  if (!isInteger(id)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   const task = await prisma.task.findUnique({
@@ -30,8 +30,8 @@ export const getTask: Middleware = async (ctx) => {
 
 export const getCount: Middleware = async (ctx) => {
   const id = +ctx.params['id']!
-  if (!isNumber(id)) {
-    throw new createHttpError.BadRequest('请输入任务 id')
+  if (!isInteger(id)) {
+    throw new createHttpError.BadRequest('参数错误')
   }
 
   ctx.body = await prisma.project.count({

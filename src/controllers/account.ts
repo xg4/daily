@@ -1,4 +1,5 @@
 import type { Middleware } from '@koa/router'
+import type { Task } from '@prisma/client'
 import { SHA256 } from 'crypto-js'
 import createHttpError from 'http-errors'
 import {
@@ -155,17 +156,28 @@ export const updateAccount: Middleware = async (ctx) => {
     where: {
       id,
     },
-    data: {
-      name,
-      description,
-      cookie,
-      cookieHash: SHA256(cookie).toString(),
-    },
+    data: Object.assign(
+      {
+        name,
+        description,
+      },
+      cookie && account.cookie !== cookie
+        ? {
+            cookie,
+            cookieHash: SHA256(cookie).toString(),
+            latestCookie: null,
+          }
+        : {}
+    ),
   })
 
   const { taskIds } = ctx.request.body
   const ids = isArray(taskIds) ? taskIds.map(Number).filter(isInteger) : []
-  const tasks = await diffTasks(id, ids)
+
+  let tasks: Task[] = []
+  if (ids.length) {
+    tasks = await diffTasks(id, ids)
+  }
 
   ctx.body = merge(omit(newAccount, ACCOUNT_OMIT), { tasks })
 }
